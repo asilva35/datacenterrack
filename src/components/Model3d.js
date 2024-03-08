@@ -4,6 +4,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
 import * as dat from 'dat.gui';
 
 class Model3dScene {
@@ -14,8 +20,8 @@ class Model3dScene {
     this.debugObject.scene = {
       antialias: true,
       alpha: true,
-      environmentMap: true,
-      bgColor: '#2b3a93',
+      showEnvironmentMap: false,
+      bgColor: '#131316',
     };
 
     this.scene = new this.THREE.Scene();
@@ -97,6 +103,39 @@ class Model3dScene {
     this.clock = new this.THREE.Clock();
 
     this.addObjects();
+
+    //BLOOM EFFECT
+
+    this.debugObject.bloom = {
+      threshold: 1.0,
+      strength: 0.3,
+      radius: 0.57,
+      exposure: 1.0,
+    };
+
+    const renderScene = new RenderPass(this.scene, this.camera);
+
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.5,
+      0.4,
+      0.85
+    );
+    this.bloomPass.threshold = this.debugObject.bloom.threshold;
+    this.bloomPass.strength = this.debugObject.bloom.strength;
+    this.bloomPass.radius = this.debugObject.bloom.radius;
+
+    const outputPass = new OutputPass();
+
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(renderScene);
+    this.composer.addPass(this.bloomPass);
+    this.composer.addPass(outputPass);
+
+    this.renderer.toneMappingExposure = Math.pow(
+      this.debugObject.bloom.exposure,
+      4.0
+    );
 
     if (this.debug) {
       this.debugModel();
@@ -212,7 +251,7 @@ class Model3dScene {
       });
 
     this.guiBgFolder
-      .add(that.debugObject.scene, 'environmentMap')
+      .add(that.debugObject.scene, 'showEnvironmentMap')
       .onChange((value) => {
         if (value) {
           this.scene.background = this.environmentMap;
@@ -324,6 +363,36 @@ class Model3dScene {
     });
 
     this.guiFolderLights.close();
+
+    //DEBUG BLOOM
+    const bloomFolder = this.gui.addFolder('Bloom');
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'threshold', 0.0, 1.0, 0.1)
+      .onChange(function (value) {
+        that.bloomPass.threshold = Number(value);
+      });
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'strength', 0.0, 3.0, 0.1)
+      .onChange(function (value) {
+        that.bloomPass.strength = Number(value);
+      });
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'radius', 0.0, 1.0, 0.1)
+      .step(0.01)
+      .onChange(function (value) {
+        that.bloomPass.radius = Number(value);
+      });
+
+    const toneMappingFolder = bloomFolder.addFolder('tone mapping');
+
+    toneMappingFolder
+      .add(that.debugObject.bloom, 'exposure', 0.1, 2, 0.1)
+      .onChange(function (value) {
+        that.renderer.toneMappingExposure = Math.pow(value, 4.0);
+      });
   }
 
   addCubeTexture(n) {
@@ -337,7 +406,7 @@ class Model3dScene {
       '/assets/textures/' + n + '/nz.png',
     ]);
     this.environmentMap.encoding = THREE.sRGBEncoding;
-    if (this.debugObject.scene.environmentMap) {
+    if (this.debugObject.scene.showEnvironmentMap) {
       this.scene.background = this.environmentMap;
     }
     this.scene.environment = this.environmentMap;
@@ -350,6 +419,8 @@ class Model3dScene {
     this.renderer.render(this.scene, this.camera);
 
     if (this.controls.enabled) this.controls.update();
+
+    this.composer.render();
   }
 }
 
