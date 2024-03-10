@@ -152,11 +152,47 @@ class Model3dScene {
     const gltfLoader = new GLTFLoader();
     gltfLoader.setDRACOLoader(this.dracoLoader);
 
+    const lightMaterial = new THREE.MeshStandardMaterial({
+      color: 0x03e4ed,
+      emissive: 0x03d0d8,
+      metalness: 0,
+      roughness: 0.5,
+      envMapIntensity: 5,
+    });
+
     gltfLoader.load(
       './assets/models/datacenter-rack.glb',
       (gltf) => {
         this.scene.add(gltf.scene);
         this.updateAllMaterials();
+        this.scene.traverse((child) => {
+          if (child.name === 'server-rack-clone01') {
+            const numberRacks = 8;
+            for (let i = 0; i < numberRacks; i++) {
+              const serverRack = child.clone();
+              serverRack.position.set(
+                child.position.x,
+                child.position.y,
+                child.position.z + (i + 1) * -2.01
+              );
+              serverRack.traverse((serverRackChild) => {
+                if (serverRackChild.name === 'left-side') {
+                  serverRackChild.material = lightMaterial;
+                }
+                if (serverRackChild.name === 'right-side') {
+                  if (i + 1 < numberRacks)
+                    serverRackChild.material = lightMaterial;
+                }
+              });
+              this.scene.add(serverRack);
+            }
+            child.traverse((childOriginal) => {
+              if (childOriginal.name === 'right-side') {
+                childOriginal.material = lightMaterial;
+              }
+            });
+          }
+        });
       },
       undefined,
       (error) => {
@@ -219,6 +255,29 @@ class Model3dScene {
     this.lights.push({
       light: directionalLight02,
       helper: directionalLightHelper02,
+    });
+
+    const directionalLight03 = new THREE.DirectionalLight(0xffffff, 0.05);
+    directionalLight03.position.set(21.8, 3.9, 3.9);
+    directionalLight03.scale.set(1, 1, 1);
+    directionalLight03.rotation.set(0.3, -0.3, -0.1);
+    directionalLight03.castShadow = true;
+    directionalLight03.shadow.camera.far = 300;
+    directionalLight03.shadow.mapSize.set(1024, 1024);
+    directionalLight03.shadow.normalBias = 0.05; //CURVE SURFACES
+    //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
+    this.scene.add(directionalLight03);
+
+    const directionalLightHelper03 = new THREE.DirectionalLightHelper(
+      directionalLight03,
+      2
+    );
+    this.scene.add(directionalLightHelper03);
+    directionalLightHelper03.visible = false;
+
+    this.lights.push({
+      light: directionalLight03,
+      helper: directionalLightHelper03,
     });
   }
 
