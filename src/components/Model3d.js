@@ -11,6 +11,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 import * as dat from 'dat.gui';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 class Model3dScene {
   constructor(options) {
@@ -139,6 +140,9 @@ class Model3dScene {
 
     if (this.debug) {
       this.debugModel();
+      this.stats = new Stats();
+      this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+      document.body.appendChild(this.stats.dom);
     }
 
     // Inicia la animación
@@ -146,6 +150,7 @@ class Model3dScene {
   }
 
   addObjects() {
+    const that = this;
     this.dracoLoader = new DRACOLoader();
     this.dracoLoader.setDecoderPath('./assets/draco/');
 
@@ -163,36 +168,58 @@ class Model3dScene {
     gltfLoader.load(
       './assets/models/datacenter-rack.glb',
       (gltf) => {
-        this.scene.add(gltf.scene);
-        this.updateAllMaterials();
-        this.scene.traverse((child) => {
-          if (child.name === 'server-rack-clone01') {
-            const numberRacks = 8;
-            for (let i = 0; i < numberRacks; i++) {
-              const serverRack = child.clone();
-              serverRack.position.set(
-                child.position.x,
-                child.position.y,
-                child.position.z + (i + 1) * -2.01
-              );
-              serverRack.traverse((serverRackChild) => {
-                if (serverRackChild.name === 'left-side') {
-                  serverRackChild.material = lightMaterial;
-                }
-                if (serverRackChild.name === 'right-side') {
-                  if (i + 1 < numberRacks)
-                    serverRackChild.material = lightMaterial;
-                }
-              });
-              this.scene.add(serverRack);
-            }
-            child.traverse((childOriginal) => {
-              if (childOriginal.name === 'right-side') {
-                childOriginal.material = lightMaterial;
+        //this.scene.add(gltf.scene);
+        let floor;
+        const firstRow = new THREE.Group();
+        gltf.scene.traverse((child) => {
+          if (child.name === 'floor') {
+            floor = child;
+          }
+          if (child.name === 'server-rack-01') {
+            child.traverse((serverRackChild) => {
+              if (serverRackChild.name === 'logo-rack') {
+                new THREE.TextureLoader().load(
+                  '/assets/images/logo.png?v=1',
+                  function (texture) {
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    texture.flipY = false;
+                    serverRackChild.material = new THREE.MeshBasicMaterial({
+                      map: texture,
+                      transparent: true,
+                      opacity: 0.5,
+                    });
+                    const numberRacks = 9;
+                    for (let i = 0; i < numberRacks; i++) {
+                      const serverRack = child.clone();
+                      serverRack.position.set(
+                        child.position.x,
+                        child.position.y,
+                        child.position.z + i * -2.01
+                      );
+                      serverRack.traverse((serverRackChild) => {
+                        if (serverRackChild.name === 'left-side-rack') {
+                          if (i > 0) serverRackChild.material = lightMaterial;
+                        }
+                        if (serverRackChild.name === 'right-side-rack') {
+                          if (i + 1 < numberRacks)
+                            serverRackChild.material = lightMaterial;
+                        }
+                      });
+                      firstRow.add(serverRack);
+                    }
+                    const secondRow = firstRow.clone();
+                    secondRow.position.set(-10, 0, 0);
+                    that.scene.add(firstRow);
+                    that.scene.add(secondRow);
+                  }
+                );
               }
             });
           }
         });
+        this.scene.add(floor);
+        this.updateAllMaterials();
       },
       undefined,
       (error) => {
@@ -480,6 +507,10 @@ class Model3dScene {
     if (this.controls.enabled) this.controls.update();
 
     this.composer.render();
+
+    if (this.debug) {
+      this.stats.update();
+    }
   }
 }
 
