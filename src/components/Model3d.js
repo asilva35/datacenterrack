@@ -21,7 +21,7 @@ class Model3dScene {
     this.debugObject.scene = {
       antialias: true,
       alpha: true,
-      showEnvironmentMap: false,
+      showEnvironmentMap: true,
       bgColor: '#131316',
     };
 
@@ -229,7 +229,7 @@ class Model3dScene {
 
     this.addLights();
 
-    this.addCubeTexture(5);
+    this.addCubeTexture(8);
   }
 
   addLights() {
@@ -534,5 +534,5 @@ export default function Model3d(props) {
     };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return <canvas class="Model3d" ref={canvasRef} />;
 }

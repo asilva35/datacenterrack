@@ -13,7 +13,7 @@ export default function Home() {
     <>
       <Metaheader />
       <Layout></Layout>
-      <Model3d debug={true} />
+      <Model3d debug={false} />
     </>
   );
 }
