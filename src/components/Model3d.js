@@ -8,6 +8,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+//import { UnrealBloomPass } from '@/lib/UnrealBloomPass';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 import * as dat from 'dat.gui';
@@ -20,15 +21,15 @@ class Model3dScene {
     this.debugObject = {};
     this.debugObject.scene = {
       antialias: true,
-      alpha: true,
+      alpha: false,
       showEnvironmentMap: true,
-      bgColor: '#131316',
+      bgColor: '#000000',
     };
 
     this.scene = new this.THREE.Scene();
 
     //this.scene.background = new THREE.Color(0x000000);
-    this.scene.background = new THREE.Color(this.debugObject.scene.bgColor);
+    //this.scene.background = new THREE.Color(this.debugObject.scene.bgColor);
 
     // Crea una cámara
     this.camera = new THREE.PerspectiveCamera(
@@ -38,10 +39,12 @@ class Model3dScene {
       1000
     );
 
+    //Object { x: 0.29982961096670824, y: 3.945888758635246, z: 46.62209059325908 }
+
     this.debugObject.camera_position = {
-      x: 3.3274672488830483,
-      y: 4.331233490901349,
-      z: 4.857212936449232,
+      x: 0.29982961096670824,
+      y: 3.945888758635246,
+      z: 46.62209059325908,
     };
 
     this.camera.position.set(
@@ -50,10 +53,12 @@ class Model3dScene {
       this.debugObject.camera_position.z
     );
 
+    //Object { x: -6.123064386655354, y: 3.5332994279103533, z: 47.76636911290018 }
+
     this.debugObject.camera_lookat = {
-      x: -2.47395023923302,
-      y: 2.6172408673131975,
-      z: 1.2597406195922987,
+      x: -6.123064386655354,
+      y: 3.5332994279103533,
+      z: 47.76636911290018,
     };
 
     this.container = options.dom;
@@ -71,11 +76,11 @@ class Model3dScene {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.container,
       antialias: this.debugObject.scene.antialias,
-      //alpha: this.debugObject.scene.alpha,
+      alpha: this.debugObject.scene.alpha,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x111111, 1);
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.toneMapping = THREE.LinearToneMapping;
@@ -108,10 +113,10 @@ class Model3dScene {
     //BLOOM EFFECT
 
     this.debugObject.bloom = {
-      threshold: 1.0,
+      threshold: 0.1,
       strength: 0.3,
-      radius: 0.57,
-      exposure: 1.0,
+      radius: 0.6,
+      exposure: 1.4,
     };
 
     const renderScene = new RenderPass(this.scene, this.camera);
@@ -209,7 +214,10 @@ class Model3dScene {
                       firstRow.add(serverRack);
                     }
                     const secondRow = firstRow.clone();
-                    secondRow.position.set(-10, 0, 0);
+                    firstRow.rotation.y = (7 / 6) * Math.PI;
+                    firstRow.position.set(15, 0, 70);
+                    secondRow.rotation.y = Math.PI / 6;
+                    secondRow.position.set(-30, 0, 5);
                     that.scene.add(firstRow);
                     that.scene.add(secondRow);
                   }
@@ -229,7 +237,7 @@ class Model3dScene {
 
     this.addLights();
 
-    this.addCubeTexture(8);
+    this.addCubeTexture(11);
   }
 
   addLights() {
@@ -238,8 +246,8 @@ class Model3dScene {
 
     this.lights = [];
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 4.5);
-    directionalLight.position.set(-17.5, 16.2, 8.4);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(-50, 16.2, 49.9);
     directionalLight.scale.set(1, 1, 1);
     directionalLight.rotation.set(0, 0.7, 0);
     directionalLight.castShadow = true;
@@ -261,10 +269,10 @@ class Model3dScene {
       helper: directionalLightHelper,
     });
 
-    const directionalLight02 = new THREE.DirectionalLight(0xffffff, 5);
-    directionalLight02.position.set(9.5, 3.9, 20.7);
+    const directionalLight02 = new THREE.DirectionalLight(0xffffff, 1.45);
+    directionalLight02.position.set(8.4, 9.5, 45.4);
     directionalLight02.scale.set(1, 1, 1);
-    directionalLight02.rotation.set(0, -1.5, 0);
+    directionalLight02.rotation.set(-0.2, -0.7, 0.2);
     directionalLight02.castShadow = true;
     directionalLight02.shadow.camera.far = 300;
     directionalLight02.shadow.mapSize.set(1024, 1024);
@@ -284,28 +292,28 @@ class Model3dScene {
       helper: directionalLightHelper02,
     });
 
-    const directionalLight03 = new THREE.DirectionalLight(0xffffff, 0.05);
-    directionalLight03.position.set(21.8, 3.9, 3.9);
-    directionalLight03.scale.set(1, 1, 1);
-    directionalLight03.rotation.set(0.3, -0.3, -0.1);
-    directionalLight03.castShadow = true;
-    directionalLight03.shadow.camera.far = 300;
-    directionalLight03.shadow.mapSize.set(1024, 1024);
-    directionalLight03.shadow.normalBias = 0.05; //CURVE SURFACES
-    //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
-    this.scene.add(directionalLight03);
+    // const directionalLight03 = new THREE.DirectionalLight(0xffffff, 0.05);
+    // directionalLight03.position.set(21.8, 3.9, 3.9);
+    // directionalLight03.scale.set(1, 1, 1);
+    // directionalLight03.rotation.set(0.3, -0.3, -0.1);
+    // directionalLight03.castShadow = true;
+    // directionalLight03.shadow.camera.far = 300;
+    // directionalLight03.shadow.mapSize.set(1024, 1024);
+    // directionalLight03.shadow.normalBias = 0.05; //CURVE SURFACES
+    // //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
+    // this.scene.add(directionalLight03);
 
-    const directionalLightHelper03 = new THREE.DirectionalLightHelper(
-      directionalLight03,
-      2
-    );
-    this.scene.add(directionalLightHelper03);
-    directionalLightHelper03.visible = false;
+    // const directionalLightHelper03 = new THREE.DirectionalLightHelper(
+    //   directionalLight03,
+    //   2
+    // );
+    // this.scene.add(directionalLightHelper03);
+    // directionalLightHelper03.visible = false;
 
-    this.lights.push({
-      light: directionalLight03,
-      helper: directionalLightHelper03,
-    });
+    // this.lights.push({
+    //   light: directionalLight03,
+    //   helper: directionalLightHelper03,
+    // });
   }
 
   updateAllMaterials() {
@@ -534,5 +542,5 @@ export default function Model3d(props) {
     };
   }, []);
 
-  return <canvas class="Model3d" ref={canvasRef} />;
+  return <canvas className="Model3d" ref={canvasRef} />;
 }

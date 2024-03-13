@@ -22,7 +22,7 @@ export default function TopBar(props) {
       <NavbarBrand>
         <Link href="/">
           <Image
-            src={`/assets/images/logo.svg`}
+            src={`/assets/images/logo-white.svg`}
             width={129}
             height={40}
             alt="Logo"

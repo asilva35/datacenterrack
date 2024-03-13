@@ -7,6 +7,7 @@ import styles from '@/styles/MainNavigation.module.css';
 
 export default function MainNavigation(props) {
   const { direction } = props;
+  const [currentPage, setCurrentPage] = React.useState('home');
   const [selectedOption, setSelectedOption] = React.useState('');
   const onClickMenu = (path) => {
     router.push(path);
@@ -20,22 +21,45 @@ export default function MainNavigation(props) {
   return (
     <div className={`${styles.MainNavigation} ${styles[direction]}`}>
       <NavbarItem>
-        <Link href="/" aria-current="page">
+        <Link
+          href="/"
+          className={`${
+            currentPage === 'home' ? styles.selected : styles.link
+          }`}
+        >
           Home
         </Link>
       </NavbarItem>
       <NavbarItem isActive>
-        <Link color="foreground" href="#">
+        <Link
+          color="foreground"
+          href="#"
+          className={`${
+            currentPage === 'features' ? styles.selected : styles.link
+          }`}
+        >
           Features
         </Link>
       </NavbarItem>
       <NavbarItem>
-        <Link color="foreground" href="#">
+        <Link
+          color="foreground"
+          href="#"
+          className={`${
+            currentPage === 'services' ? styles.selected : styles.link
+          }`}
+        >
           Services
         </Link>
       </NavbarItem>
       <NavbarItem>
-        <Link color="foreground" href="#">
+        <Link
+          color="foreground"
+          href="#"
+          className={`${
+            currentPage === 'contact' ? styles.selected : styles.link
+          }`}
+        >
           Contact
         </Link>
       </NavbarItem>
