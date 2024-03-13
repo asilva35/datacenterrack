@@ -177,6 +177,7 @@ class Model3dScene {
         let floor;
         const firstRow = new THREE.Group();
         gltf.scene.traverse((child) => {
+          console.log(child.name);
           if (child.name === 'floor') {
             floor = child;
           }

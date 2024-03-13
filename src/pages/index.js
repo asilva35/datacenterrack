@@ -48,14 +48,6 @@ export default function Home() {
           </div>
         </section>
       </Layout>
-      {/* <div className={`${styles.bgMain}`}>
-        <Image
-          src="/assets/images/bg-main.jpg"
-          width={1280}
-          height={600}
-          alt=""
-        />
-      </div> */}
       <Model3d debug={false} />
     </>
   );
