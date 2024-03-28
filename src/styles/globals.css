@@ -13,10 +13,13 @@
   padding: 0;
   box-sizing: border-box;
 }
+html{
+  scroll-behavior: smooth;
+}
 body {
   font-family: var(--primary-font), sans-serif;
+  scroll-behavior: smooth;
 }
-
 
 .dg.ac{z-index: 99!important;display: block;}
 
@@ -29,3 +32,6 @@ body {
   z-index: -1;
 }
 
+/* .title,.description{
+  opacity: 0;
+} */
