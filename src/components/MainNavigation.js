@@ -33,12 +33,12 @@ export default function MainNavigation(props) {
       <NavbarItem isActive>
         <Link
           color="foreground"
-          href="#"
+          href="#partners"
           className={`${
             currentPage === 'features' ? styles.selected : styles.link
           }`}
         >
-          Features
+          Partners
         </Link>
       </NavbarItem>
       <NavbarItem>

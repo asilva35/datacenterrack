@@ -110,7 +110,6 @@ class Model3dScene {
     this.clock = new this.THREE.Clock();
 
     this.addObjects();
-    //this.addGsap();
     this.addAnimation();
 
     //BLOOM EFFECT
@@ -156,190 +155,8 @@ class Model3dScene {
     this.tick();
   }
 
-  timeline01(tl) {
+  timeline01() {
     const that = this;
-    const tl_screen = gsap
-      .timeline({
-        paused: true,
-        defaults: { duration: 0.75, ease: 'linear', delay: -1 },
-        onStart: () => {},
-        onUpdate: () => {
-          that.controls.update();
-        },
-        onReverseComplete: () => {},
-      })
-      .to(
-        this.camera.position,
-        {
-          x: -5.600477636180801,
-          y: 4.70049239322262,
-          z: 41.35561765453086,
-          onStart: function () {},
-        },
-        '01'
-      )
-      .to(
-        this.controls.target,
-        {
-          x: -6.123064386655354,
-          y: 3.5332994279103533,
-          z: 47.76636911290018,
-          onStart: function () {},
-        },
-        '01'
-      )
-      .to(
-        [
-          '.section-01 .title',
-          '.section-01 .subtitle',
-          '.section-01 .cta',
-          '.section-01 .description',
-        ],
-        {
-          opacity: 0,
-        },
-        '01'
-      )
-      .from(
-        [
-          '.section-02 .title',
-          '.section-02 .subtitle',
-          '.section-02 .cta',
-          '.section-02 .description',
-        ],
-        {
-          opacity: 0,
-          stagger: 0.05,
-        },
-        '01'
-      );
-
-    tl.to(
-      '.empty',
-      {
-        opacity: 0,
-        onStart: () => {
-          tl_screen.play();
-        },
-        onReverseComplete: () => {
-          tl_screen.reverse();
-        },
-      },
-      'tline01'
-    );
-  }
-
-  timeline02(tl) {
-    const that = this;
-    const tl_screen = gsap
-      .timeline({
-        paused: true,
-        defaults: { duration: 0.75, ease: 'linear', delay: -1 },
-        onStart: () => {},
-        onUpdate: () => {
-          that.controls.update();
-        },
-        onReverseComplete: () => {},
-      })
-      .to(
-        this.camera.position,
-        {
-          x: 1.341136783810105,
-          y: 5.960320392481422,
-          z: 47.124229637943216,
-          onStart: function () {},
-        },
-        '01'
-      )
-      .to(
-        this.controls.target,
-        {
-          x: -1.5690840823671879,
-          y: 4.044115931356351,
-          z: 41.108411648133135,
-          onStart: function () {},
-        },
-        '01'
-      )
-      .to(
-        [
-          '.section-02 .title',
-          '.section-02 .subtitle',
-          '.section-02 .cta',
-          '.section-02 .description',
-        ],
-        {
-          opacity: 0,
-        },
-        '01'
-      )
-      .from(
-        [
-          '.section-03 .title',
-          '.section-03 .subtitle',
-          '.section-03 .cta',
-          '.section-03 .description',
-        ],
-        {
-          opacity: 0,
-          stagger: 0.05,
-        },
-        '01'
-      );
-
-    tl.to(
-      '.empty',
-      {
-        opacity: 0,
-        onStart: () => {
-          tl_screen.play();
-        },
-        onReverseComplete: () => {
-          tl_screen.reverse();
-        },
-      },
-      'tline02'
-    );
-  }
-
-  addGsap() {
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.normalizeScroll(true);
-
-    const tl = gsap.timeline({
-      paused: true,
-      defaults: { duration: 0.1, ease: 'linear' },
-      onStart: function () {},
-      onUpdate: function () {},
-      onComplete: function () {},
-      onReverseComplete: function () {},
-    });
-
-    this.timeline01(tl);
-    this.timeline02(tl);
-
-    let timeOutDebounce = null;
-
-    ScrollTrigger.create({
-      trigger: 'body',
-      start: 'top top',
-      end: 'bottom bottom',
-      //scrub: 3,
-      //immediateRender: false,
-      //markers: true,
-      //pin: true,
-      onUpdate: (self) => {
-        clearTimeout(timeOutDebounce);
-        timeOutDebounce = setTimeout(() => {
-          tl.progress(self.progress);
-        }, 300);
-      },
-    });
-  }
-
-  addAnimation() {
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.normalizeScroll(true);
     gsap
       .timeline({
         paused: false,
@@ -359,9 +176,9 @@ class Model3dScene {
       .to(
         this.camera.position,
         {
-          x: -5.600477636180801,
-          y: 4.70049239322262,
-          z: 41.35561765453086,
+          x: -6.483649629026272,
+          y: 3.720652319968307,
+          z: 41.3368725419376,
           onStart: function () {},
         },
         '01'
@@ -369,14 +186,17 @@ class Model3dScene {
       .to(
         this.controls.target,
         {
-          x: -6.123064386655354,
-          y: 3.5332994279103533,
-          z: 47.76636911290018,
+          x: -5.823706178520901,
+          y: 4.285027011218124,
+          z: 47.81600210235389,
           onStart: function () {},
         },
         '01'
       );
+  }
 
+  timeline02() {
+    const that = this;
     gsap
       .timeline({
         paused: false,
@@ -396,9 +216,9 @@ class Model3dScene {
       .to(
         this.camera.position,
         {
-          x: 1.341136783810105,
-          y: 5.960320392481422,
-          z: 47.124229637943216,
+          x: -1.0008361428306436,
+          y: 5.799263039916481,
+          z: 47.75440332250858,
           onStart: function () {},
         },
         '01'
@@ -406,13 +226,62 @@ class Model3dScene {
       .to(
         this.controls.target,
         {
-          x: -1.5690840823671879,
-          y: 4.044115931356351,
-          z: 41.108411648133135,
+          x: -0.12865801634989135,
+          y: 3.8275847215889476,
+          z: 41.14508564421529,
           onStart: function () {},
         },
         '01'
       );
+  }
+
+  timeline03() {
+    const that = this;
+    gsap
+      .timeline({
+        paused: false,
+        defaults: { duration: 1, ease: 'linear' },
+        onStart: function () {},
+        onUpdate: function () {},
+        onComplete: function () {},
+        onReverseComplete: function () {},
+        scrollTrigger: {
+          trigger: '.section-03',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 3,
+          //markers: true,
+        },
+      })
+      .to(
+        this.camera.position,
+        {
+          x: -0.5083713764016347,
+          y: 5.185271038274296,
+          z: 50.40015091322145,
+          onStart: function () {},
+        },
+        '01'
+      )
+      .to(
+        this.controls.target,
+        {
+          x: 2.922541906087581,
+          y: 4.084965883649713,
+          z: 44.653223053993,
+          onStart: function () {},
+        },
+        '01'
+      );
+  }
+
+  addAnimation() {
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.normalizeScroll(true);
+
+    this.timeline01();
+    this.timeline02();
+    this.timeline03();
   }
 
   addObjects() {
