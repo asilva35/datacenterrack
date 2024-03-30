@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -63,6 +63,7 @@ class Model3dScene {
     };
 
     this.container = options.dom;
+    this.overlay = options.overlay;
     this.debug = options.debug;
 
     this.camera.lookAt(
@@ -256,9 +257,9 @@ class Model3dScene {
       .to(
         this.camera.position,
         {
-          x: -0.5083713764016347,
-          y: 5.185271038274296,
-          z: 50.40015091322145,
+          x: -3.4041206980614267,
+          y: 3.081001524357474,
+          z: 47.96995401469069,
           onStart: function () {},
         },
         '01'
@@ -266,22 +267,93 @@ class Model3dScene {
       .to(
         this.controls.target,
         {
-          x: 2.922541906087581,
-          y: 4.084965883649713,
-          z: 44.653223053993,
+          x: 0.6313947272280166,
+          y: 3.3850634775694113,
+          z: 42.52650123868173,
           onStart: function () {},
         },
         '01'
       );
   }
 
+  textFadeInOut() {
+    const that = this;
+    const sections = document.querySelectorAll('.section');
+    if (sections && sections.length > 0 && sections.length < 100) {
+      for (let i = 0; i < sections.length; i++) {
+        const section_num = i < 10 ? `0${i + 1}` : i + 1;
+        const section = `.section-${section_num} .sectionInfo`;
+        const tl = gsap
+          .timeline({
+            paused: true,
+            defaults: { duration: 0.5, ease: 'linear' },
+            onStart: function () {},
+            onUpdate: function () {},
+            onComplete: function () {},
+            onReverseComplete: function () {},
+          })
+          .to(
+            section,
+            {
+              opacity: 0,
+              onStart: function () {},
+            },
+            '01'
+          );
+
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top +=64px',
+          end: '+=100px +=64px',
+          scrub: 3,
+          //markers: true,
+          onUpdate: (self) => {
+            tl.progress(self.progress);
+          },
+        });
+      }
+    }
+  }
+
   addAnimation() {
     gsap.registerPlugin(ScrollTrigger);
     ScrollTrigger.normalizeScroll(true);
-
     this.timeline01();
     this.timeline02();
     this.timeline03();
+  }
+
+  show() {
+    const camera_position = { ...this.camera.position };
+    const control_target = { ...this.controls.target };
+    this.controls.enabled = false;
+    this.camera.position.set(
+      -1.2615372011680765,
+      3.9436160867082823,
+      53.44285843793881
+    );
+    this.controls.target.set(
+      -6.123064386655354,
+      3.5332994279103533,
+      47.76636911290018
+    );
+    this.controls.update();
+    this.controls.enabled = true;
+    this.overlay.classList.add('hide');
+    gsap.to(this.camera.position, {
+      x: camera_position.x,
+      y: camera_position.y,
+      z: camera_position.z,
+      duration: 1,
+      onStart: () => {},
+    });
+    gsap.to(this.controls.target, {
+      x: control_target.x,
+      y: control_target.y,
+      z: control_target.z,
+      duration: 1,
+    });
+    this.textFadeInOut();
   }
 
   addObjects() {
@@ -653,24 +725,38 @@ class Model3dScene {
 }
 
 export default function Model3d(props) {
-  const { debug } = props;
+  const { debug, show } = props;
   const canvasRef = useRef();
+  const model3dOverlay = useRef();
   const flag = useRef();
+  const [model3d, setModel3D] = useState(null);
 
   useEffect(() => {
     if (flag.current) return;
     flag.current = true;
-    const model3d = new Model3dScene({
+    const _model3d = new Model3dScene({
       dom: canvasRef.current,
+      overlay: model3dOverlay.current,
       debug,
     });
-    document.model3d = model3d;
+    document.model3d = _model3d;
+    setModel3D(_model3d);
     // Limpia los recursos al desmontar el componente
     return () => {
-      model3d.renderer.dispose();
-      model3d.scene.remove(model3d.cube);
+      _model3d.renderer.dispose();
     };
   }, []);
 
-  return <canvas className="Model3d" ref={canvasRef} />;
+  useEffect(() => {
+    if (show && model3d) {
+      model3d.show();
+    }
+  }, [show, model3d]);
+
+  return (
+    <>
+      <div className="Model3dOverlay" ref={model3dOverlay}></div>
+      <canvas className="Model3d" ref={canvasRef} />
+    </>
+  );
 }

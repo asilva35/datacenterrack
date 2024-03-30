@@ -13,11 +13,19 @@ const Model3d = dynamic(() => import('@/components/Model3d'), {
 });
 
 export default function Home() {
-  const [model3DLoaded, setModel3DLoaded] = useState(false);
+  const [show3dModel, setShow3dModel] = useState(false);
   useEffect(() => {
     if (window !== undefined) {
       window.scrollTo(0, 0);
     }
+  }, []);
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      setShow3dModel(true);
+    }, 7000);
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
   return (
     <>
@@ -25,27 +33,61 @@ export default function Home() {
       <Layout>
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
-            <div className={`${styles.section} ${styles.section01} section-01`}>
-              <div className={`${styles.sectionInfo}`}>
+            <div
+              className={`${styles.section} ${styles.section01} section section-01`}
+            >
+              <div className={`${styles.sectionInfo} sectionInfo`}>
                 <div className={`${styles.sectionInfoAbsolute}`}>
                   <p className={`${styles.subtitle} subtitle`}>
                     World&apos;s leading datacenter supplier
                   </p>
                   <h1 className={`${styles.title}`}>
                     <span className={`${styles.primaryText}`}>
-                      <SplitText
-                        LetterWrapper={({ letterIndex, children }) => (
-                          <span
-                            className={`title ${styles.letterTitle} ${
-                              styles['letterTitle-' + letterIndex]
-                            }`}
-                          >
-                            {children}
-                          </span>
-                        )}
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle01}`}
                       >
-                        Improving
-                      </SplitText>
+                        I
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle02}`}
+                      >
+                        m
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle03}`}
+                      >
+                        p
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle04}`}
+                      >
+                        r
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle05}`}
+                      >
+                        o
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle06}`}
+                      >
+                        v
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle07}`}
+                      >
+                        i
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle08}`}
+                      >
+                        n
+                      </span>
+                      <span
+                        className={`title ${styles.letterTitle} ${styles.letterTitle09}`}
+                      >
+                        g
+                      </span>
                     </span>{' '}
                     <span className={`${styles.line02}`}>your</span>
                     <span className={`${styles.line03}`}>Datacenter</span>
@@ -62,22 +104,17 @@ export default function Home() {
             </div>
           </header>
           <section>
-            <div id="partners" className={`${styles.section} section-02`}>
-              <div className={`${styles.sectionInfo}`}>
+            <div
+              id="partners"
+              className={`${styles.section} section section-02`}
+            >
+              <div className={`${styles.sectionInfo} sectionInfo`}>
                 <p className={`${styles.subtitle} subtitle`}>
                   Why Partner with Us?
                 </p>
-                <h1 className={`${styles.title}`}>
+                <h1 className={`${styles.title} ${styles.medium}`}>
                   <span className={`${styles.primaryText}`}>
-                    <SplitText
-                      LetterWrapper={({ letterIndex, children }) => (
-                        <span key={letterIndex} className="title">
-                          {children}
-                        </span>
-                      )}
-                    >
-                      Experience, Expertise, Efficiency
-                    </SplitText>
+                    Experience, Expertise, Efficiency
                   </span>
                 </h1>
                 <p className={`${styles.description} description`}>
@@ -92,31 +129,15 @@ export default function Home() {
           </section>
           <section>
             <div
-              className={`${styles.section} ${styles.contentRight} section-03`}
+              className={`${styles.section} ${styles.contentRight} section section-03`}
             >
-              <div className={`${styles.sectionInfo}`}>
+              <div className={`${styles.sectionInfo} sectionInfo`}>
                 <p className={`${styles.subtitle} subtitle`}>Our Services</p>
                 <h1 className={`${styles.title} ${styles.medium}`}>
                   <span className={`${styles.primaryText}`}>
-                    <SplitText
-                      LetterWrapper={({ letterIndex, children }) => (
-                        <span key={letterIndex} className="title">
-                          {children}
-                        </span>
-                      )}
-                    >
-                      Building the Future
-                    </SplitText>
+                    Building the Future
                   </span>
-                  <SplitText
-                    LetterWrapper={({ letterIndex, children }) => (
-                      <span key={letterIndex} className="title">
-                        {children}
-                      </span>
-                    )}
-                  >
-                    of Data Centers
-                  </SplitText>
+                  <span>of Data Centers</span>
                 </h1>
                 <p className={`${styles.description} description`}>
                   Explore our comprehensive suite of services, including design,
@@ -130,23 +151,15 @@ export default function Home() {
           </section>
           <section>
             <div
-              className={`${styles.section} ${styles.contentRight} section-04`}
+              className={`${styles.section} ${styles.contentRight} section section-04`}
             >
-              <div className={`${styles.sectionInfo}`}>
+              <div className={`${styles.sectionInfo} sectionInfo`}>
                 <p className={`${styles.subtitle} subtitle`}>
                   Let&apos;s Get Connected
                 </p>
                 <h1 className={`${styles.title} ${styles.medium}`}>
                   <span className={`${styles.primaryText}`}>
-                    <SplitText
-                      LetterWrapper={({ letterIndex, children }) => (
-                        <span key={letterIndex} className="title">
-                          {children}
-                        </span>
-                      )}
-                    >
-                      We&apos;re Here to Help
-                    </SplitText>
+                    We&apos;re Here to Help
                   </span>
                 </h1>
                 <p className={`${styles.description} description`}>
@@ -161,7 +174,7 @@ export default function Home() {
           </section>
         </div>
       </Layout>
-      <Model3d debug={false} />
+      <Model3d debug={false} show={show3dModel} />
       <div className={`${styles.mainBg}`}>
         <div className={`${styles.ellipse}`}></div>
       </div>

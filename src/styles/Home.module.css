@@ -87,31 +87,31 @@
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
-.intro .section01 .title .primaryText .letterTitle-0{
+.intro .section01 .title .primaryText .letterTitle01{
     animation: letterTitleAnim 0.25s linear 0.5s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-1{
+.intro .section01 .title .primaryText .letterTitle02{
     animation: letterTitleAnim 0.25s linear 0.75s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-2{
+.intro .section01 .title .primaryText .letterTitle03{
     animation: letterTitleAnim 0.25s linear 1.0s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-3{
+.intro .section01 .title .primaryText .letterTitle04{
     animation: letterTitleAnim 0.25s linear 1.25s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-4{
+.intro .section01 .title .primaryText .letterTitle05{
     animation: letterTitleAnim 0.25s linear 1.5s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-5{
+.intro .section01 .title .primaryText .letterTitle06{
     animation: letterTitleAnim 0.25s linear 1.75s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-6{
+.intro .section01 .title .primaryText .letterTitle07{
     animation: letterTitleAnim 0.25s linear 2.0s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-7{
+.intro .section01 .title .primaryText .letterTitle08{
     animation: letterTitleAnim 0.25s linear 2.25s forwards;
 }
-.intro .section01 .title .primaryText .letterTitle-8{
+.intro .section01 .title .primaryText .letterTitle09{
     animation: letterTitleAnim 0.25s linear 2.5s forwards;
 }
 
