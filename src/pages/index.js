@@ -34,6 +34,7 @@ export default function Home() {
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
             <div
+              id="header"
               className={`${styles.section} ${styles.section01} section section-01`}
             >
               <div className={`${styles.sectionInfo} sectionInfo`}>
@@ -129,6 +130,7 @@ export default function Home() {
           </section>
           <section>
             <div
+              id="services"
               className={`${styles.section} ${styles.contentRight} section section-03`}
             >
               <div className={`${styles.sectionInfo} sectionInfo`}>
@@ -151,6 +153,7 @@ export default function Home() {
           </section>
           <section>
             <div
+              id="contact"
               className={`${styles.section} ${styles.contentRight} section section-04`}
             >
               <div className={`${styles.sectionInfo} sectionInfo`}>

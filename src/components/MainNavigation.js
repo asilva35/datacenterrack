@@ -4,27 +4,32 @@ import { NavbarItem, Link } from '@nextui-org/react';
 import Image from 'next/image';
 
 import styles from '@/styles/MainNavigation.module.css';
+import { useRouter } from 'next/router';
 
 export default function MainNavigation(props) {
   const { direction } = props;
-  const [currentPage, setCurrentPage] = React.useState('home');
-  const [selectedOption, setSelectedOption] = React.useState('');
+  const [currentPage, setCurrentPage] = React.useState('#header');
+  const router = useRouter();
   const onClickMenu = (path) => {
     router.push(path);
   };
 
   const onSelectOption = (option) => {
-    setSelectedOption(option);
-    if (option.has('home')) return onClickMenu('/');
+    if (option && option.search('#') === 0) {
+      document.querySelector(option).scrollIntoView();
+      setCurrentPage(option);
+    }
   };
 
   return (
     <div className={`${styles.MainNavigation} ${styles[direction]}`}>
       <NavbarItem>
         <Link
-          href="/"
+          onClick={() => {
+            onSelectOption('#header');
+          }}
           className={`${
-            currentPage === 'home' ? styles.selected : styles.link
+            currentPage === '#header' ? styles.selected : styles.link
           }`}
         >
           Home
@@ -33,9 +38,11 @@ export default function MainNavigation(props) {
       <NavbarItem isActive>
         <Link
           color="foreground"
-          href="#partners"
+          onClick={() => {
+            onSelectOption('#partners');
+          }}
           className={`${
-            currentPage === 'features' ? styles.selected : styles.link
+            currentPage === '#partners' ? styles.selected : styles.link
           }`}
         >
           Partners
@@ -44,9 +51,11 @@ export default function MainNavigation(props) {
       <NavbarItem>
         <Link
           color="foreground"
-          href="#"
+          onClick={() => {
+            onSelectOption('#services');
+          }}
           className={`${
-            currentPage === 'services' ? styles.selected : styles.link
+            currentPage === '#services' ? styles.selected : styles.link
           }`}
         >
           Services
@@ -55,9 +64,11 @@ export default function MainNavigation(props) {
       <NavbarItem>
         <Link
           color="foreground"
-          href="#"
+          onClick={() => {
+            onSelectOption('#contact');
+          }}
           className={`${
-            currentPage === 'contact' ? styles.selected : styles.link
+            currentPage === '#contact' ? styles.selected : styles.link
           }`}
         >
           Contact

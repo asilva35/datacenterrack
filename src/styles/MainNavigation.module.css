@@ -21,9 +21,11 @@
 .link{
     color: #D7D7D7;
     font-weight: 300;
+    cursor: pointer;
 }
 
 .selected{
     font-weight: 400;
     color: #FFFFFF;
+    cursor: pointer;
 }
