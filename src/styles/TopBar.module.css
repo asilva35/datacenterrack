@@ -19,8 +19,9 @@
 .logo{width:80px; height: auto;}
 
 .NavbarMenu{
-    background: #2b2b2be5;
+    background: #48324f;
 }
 .MainNavigationCNT{
     max-width: 350px;
+    padding-top: 50px;
 }
