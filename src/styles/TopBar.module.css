@@ -1,12 +1,27 @@
 .Navbar{
-    background: #fff;
+    /* background: #2b2b2be5; */
+    background: transparent;
+    backdrop-filter: none;
+    top:-64px;
+    position: fixed;
+    animation: navBarAnim 0.5s linear 6.75s forwards;
+}
+
+@keyframes navBarAnim {
+    0%{
+        top: -64px;
+    }
+    100%{
+        top: 0;
+    }
 }
 
 .logo{width:80px; height: auto;}
 
 .NavbarMenu{
-    background: #fff;
+    background: #48324f;
 }
 .MainNavigationCNT{
     max-width: 350px;
+    padding-top: 50px;
 }

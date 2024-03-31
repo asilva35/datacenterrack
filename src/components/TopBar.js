@@ -22,7 +22,7 @@ export default function TopBar(props) {
       <NavbarBrand>
         <Link href="/">
           <Image
-            src={`/assets/images/logo.svg`}
+            src={`/assets/images/logo-white.svg`}
             width={129}
             height={40}
             alt="Logo"
@@ -33,6 +33,14 @@ export default function TopBar(props) {
       <NavbarMenuToggle
         aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
         className="hide-md hide-lg hide-xl"
+        icon={
+          <Image
+            src={`/assets/images/hamburguer-menu.svg`}
+            width={34}
+            height={20}
+            alt="Menu"
+          />
+        }
       />
       <NavbarContent
         as="div"

@@ -1,10 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+//import { UnrealBloomPass } from '@/lib/UnrealBloomPass';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
 import * as dat from 'dat.gui';
+import Stats from 'three/examples/jsm/libs/stats.module';
+
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 class Model3dScene {
   constructor(options) {
@@ -13,15 +24,15 @@ class Model3dScene {
     this.debugObject = {};
     this.debugObject.scene = {
       antialias: true,
-      alpha: true,
-      environmentMap: true,
-      bgColor: '#2b3a93',
+      alpha: false,
+      showEnvironmentMap: true,
+      bgColor: '#000000',
     };
 
     this.scene = new this.THREE.Scene();
 
     //this.scene.background = new THREE.Color(0x000000);
-    this.scene.background = new THREE.Color(this.debugObject.scene.bgColor);
+    //this.scene.background = new THREE.Color(this.debugObject.scene.bgColor);
 
     // Crea una cámara
     this.camera = new THREE.PerspectiveCamera(
@@ -31,10 +42,12 @@ class Model3dScene {
       1000
     );
 
+    //Object { x: 0.29982961096670824, y: 3.945888758635246, z: 46.62209059325908 }
+
     this.debugObject.camera_position = {
-      x: 3.3274672488830483,
-      y: 4.331233490901349,
-      z: 4.857212936449232,
+      x: 0.29982961096670824,
+      y: 3.945888758635246,
+      z: 46.62209059325908,
     };
 
     this.camera.position.set(
@@ -44,12 +57,13 @@ class Model3dScene {
     );
 
     this.debugObject.camera_lookat = {
-      x: -2.47395023923302,
-      y: 2.6172408673131975,
-      z: 1.2597406195922987,
+      x: -6.123064386655354,
+      y: 3.5332994279103533,
+      z: 47.76636911290018,
     };
 
     this.container = options.dom;
+    this.overlay = options.overlay;
     this.debug = options.debug;
 
     this.camera.lookAt(
@@ -64,11 +78,11 @@ class Model3dScene {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.container,
       antialias: this.debugObject.scene.antialias,
-      //alpha: this.debugObject.scene.alpha,
+      alpha: this.debugObject.scene.alpha,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x111111, 1);
+    this.renderer.setClearColor(0x000000, 0);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.toneMapping = THREE.LinearToneMapping;
@@ -97,26 +111,324 @@ class Model3dScene {
     this.clock = new this.THREE.Clock();
 
     this.addObjects();
+    this.addAnimation();
+
+    //BLOOM EFFECT
+    this.debugObject.bloom = {
+      threshold: 0.1,
+      strength: 0.3,
+      radius: 0.6,
+      exposure: 1.4,
+    };
+
+    const renderScene = new RenderPass(this.scene, this.camera);
+
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.5,
+      0.4,
+      0.85
+    );
+    this.bloomPass.threshold = this.debugObject.bloom.threshold;
+    this.bloomPass.strength = this.debugObject.bloom.strength;
+    this.bloomPass.radius = this.debugObject.bloom.radius;
+
+    const outputPass = new OutputPass();
+
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(renderScene);
+    this.composer.addPass(this.bloomPass);
+    this.composer.addPass(outputPass);
+
+    this.renderer.toneMappingExposure = Math.pow(
+      this.debugObject.bloom.exposure,
+      4.0
+    );
 
     if (this.debug) {
       this.debugModel();
+      this.stats = new Stats();
+      this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+      document.body.appendChild(this.stats.dom);
     }
 
     // Inicia la animación
     this.tick();
   }
 
+  timeline01() {
+    const that = this;
+    gsap
+      .timeline({
+        paused: false,
+        defaults: { duration: 1, ease: 'linear' },
+        onStart: function () {},
+        onUpdate: function () {},
+        onComplete: function () {},
+        onReverseComplete: function () {},
+        scrollTrigger: {
+          trigger: '.section-01',
+          start: 'bottom bottom',
+          end: '+=100px bottom',
+          scrub: 3,
+          //markers: true,
+        },
+      })
+      .to(
+        this.camera.position,
+        {
+          x: -6.483649629026272,
+          y: 3.720652319968307,
+          z: 41.3368725419376,
+          onStart: function () {},
+        },
+        '01'
+      )
+      .to(
+        this.controls.target,
+        {
+          x: -5.823706178520901,
+          y: 4.285027011218124,
+          z: 47.81600210235389,
+          onStart: function () {},
+        },
+        '01'
+      );
+  }
+
+  timeline02() {
+    const that = this;
+    gsap
+      .timeline({
+        paused: false,
+        defaults: { duration: 1, ease: 'linear' },
+        onStart: function () {},
+        onUpdate: function () {},
+        onComplete: function () {},
+        onReverseComplete: function () {},
+        scrollTrigger: {
+          trigger: '.section-02',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 3,
+          //markers: true,
+        },
+      })
+      .to(
+        this.camera.position,
+        {
+          x: -1.0008361428306436,
+          y: 5.799263039916481,
+          z: 47.75440332250858,
+          onStart: function () {},
+        },
+        '01'
+      )
+      .to(
+        this.controls.target,
+        {
+          x: -0.12865801634989135,
+          y: 3.8275847215889476,
+          z: 41.14508564421529,
+          onStart: function () {},
+        },
+        '01'
+      );
+  }
+
+  timeline03() {
+    const that = this;
+    gsap
+      .timeline({
+        paused: false,
+        defaults: { duration: 1, ease: 'linear' },
+        onStart: function () {},
+        onUpdate: function () {},
+        onComplete: function () {},
+        onReverseComplete: function () {},
+        scrollTrigger: {
+          trigger: '.section-03',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 3,
+          //markers: true,
+        },
+      })
+      .to(
+        this.camera.position,
+        {
+          x: -3.4041206980614267,
+          y: 3.081001524357474,
+          z: 47.96995401469069,
+          onStart: function () {},
+        },
+        '01'
+      )
+      .to(
+        this.controls.target,
+        {
+          x: 0.6313947272280166,
+          y: 3.3850634775694113,
+          z: 42.52650123868173,
+          onStart: function () {},
+        },
+        '01'
+      );
+  }
+
+  textFadeInOut() {
+    const that = this;
+    const sections = document.querySelectorAll('.section');
+    if (sections && sections.length > 0 && sections.length < 100) {
+      for (let i = 0; i < sections.length; i++) {
+        const section_num = i < 10 ? `0${i + 1}` : i + 1;
+        const section = `.section-${section_num} .sectionInfo`;
+        const tl = gsap
+          .timeline({
+            paused: true,
+            defaults: { duration: 0.5, ease: 'linear' },
+            onStart: function () {},
+            onUpdate: function () {},
+            onComplete: function () {},
+            onReverseComplete: function () {},
+          })
+          .to(
+            section,
+            {
+              opacity: 0,
+              onStart: function () {},
+            },
+            '01'
+          );
+
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top +=64px',
+          end: '+=100px +=64px',
+          scrub: 3,
+          //markers: true,
+          onUpdate: (self) => {
+            tl.progress(self.progress);
+          },
+        });
+      }
+    }
+  }
+
+  addAnimation() {
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.normalizeScroll(true);
+    this.timeline01();
+    this.timeline02();
+    this.timeline03();
+  }
+
+  show() {
+    const camera_position = { ...this.camera.position };
+    const control_target = { ...this.controls.target };
+    this.controls.enabled = false;
+    this.camera.position.set(
+      -1.2615372011680765,
+      3.9436160867082823,
+      53.44285843793881
+    );
+    this.controls.target.set(
+      -6.123064386655354,
+      3.5332994279103533,
+      47.76636911290018
+    );
+    this.controls.update();
+    this.controls.enabled = true;
+    this.overlay.classList.add('hide');
+    gsap.to(this.camera.position, {
+      x: camera_position.x,
+      y: camera_position.y,
+      z: camera_position.z,
+      duration: 1,
+      onStart: () => {},
+    });
+    gsap.to(this.controls.target, {
+      x: control_target.x,
+      y: control_target.y,
+      z: control_target.z,
+      duration: 1,
+    });
+    this.textFadeInOut();
+  }
+
   addObjects() {
+    const that = this;
     this.dracoLoader = new DRACOLoader();
     this.dracoLoader.setDecoderPath('./assets/draco/');
 
     const gltfLoader = new GLTFLoader();
     gltfLoader.setDRACOLoader(this.dracoLoader);
 
+    const lightMaterial = new THREE.MeshStandardMaterial({
+      color: 0x03e4ed,
+      emissive: 0x03d0d8,
+      metalness: 0,
+      roughness: 0.5,
+      envMapIntensity: 5,
+    });
+
     gltfLoader.load(
       './assets/models/datacenter-rack.glb',
       (gltf) => {
-        this.scene.add(gltf.scene);
+        //this.scene.add(gltf.scene);
+        let floor;
+        const firstRow = new THREE.Group();
+        gltf.scene.traverse((child) => {
+          if (child.name === 'floor') {
+            floor = child;
+          }
+          if (child.name === 'server-rack-01') {
+            child.traverse((serverRackChild) => {
+              if (serverRackChild.name === 'logo-rack') {
+                new THREE.TextureLoader().load(
+                  '/assets/images/logo.png?v=1',
+                  function (texture) {
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    texture.flipY = false;
+                    serverRackChild.material = new THREE.MeshBasicMaterial({
+                      map: texture,
+                      transparent: true,
+                      opacity: 0.5,
+                    });
+                    const numberRacks = 9;
+                    for (let i = 0; i < numberRacks; i++) {
+                      const serverRack = child.clone();
+                      serverRack.position.set(
+                        child.position.x,
+                        child.position.y,
+                        child.position.z + i * -2.01
+                      );
+                      serverRack.traverse((serverRackChild) => {
+                        if (serverRackChild.name === 'left-side-rack') {
+                          if (i > 0) serverRackChild.material = lightMaterial;
+                        }
+                        if (serverRackChild.name === 'right-side-rack') {
+                          if (i + 1 < numberRacks)
+                            serverRackChild.material = lightMaterial;
+                        }
+                      });
+                      firstRow.add(serverRack);
+                    }
+                    const secondRow = firstRow.clone();
+                    firstRow.rotation.y = (7 / 6) * Math.PI;
+                    firstRow.position.set(15, 0, 70);
+                    secondRow.rotation.y = Math.PI / 6;
+                    secondRow.position.set(-30, 0, 5);
+                    that.scene.add(firstRow);
+                    that.scene.add(secondRow);
+                  }
+                );
+              }
+            });
+          }
+        });
+        this.scene.add(floor);
         this.updateAllMaterials();
       },
       undefined,
@@ -127,7 +439,7 @@ class Model3dScene {
 
     this.addLights();
 
-    this.addCubeTexture(5);
+    this.addCubeTexture(11);
   }
 
   addLights() {
@@ -136,8 +448,8 @@ class Model3dScene {
 
     this.lights = [];
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 4.5);
-    directionalLight.position.set(-17.5, 16.2, 8.4);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(-50, 16.2, 49.9);
     directionalLight.scale.set(1, 1, 1);
     directionalLight.rotation.set(0, 0.7, 0);
     directionalLight.castShadow = true;
@@ -159,10 +471,10 @@ class Model3dScene {
       helper: directionalLightHelper,
     });
 
-    const directionalLight02 = new THREE.DirectionalLight(0xffffff, 5);
-    directionalLight02.position.set(9.5, 3.9, 20.7);
+    const directionalLight02 = new THREE.DirectionalLight(0xffffff, 1.45);
+    directionalLight02.position.set(8.4, 9.5, 45.4);
     directionalLight02.scale.set(1, 1, 1);
-    directionalLight02.rotation.set(0, -1.5, 0);
+    directionalLight02.rotation.set(-0.2, -0.7, 0.2);
     directionalLight02.castShadow = true;
     directionalLight02.shadow.camera.far = 300;
     directionalLight02.shadow.mapSize.set(1024, 1024);
@@ -181,6 +493,29 @@ class Model3dScene {
       light: directionalLight02,
       helper: directionalLightHelper02,
     });
+
+    // const directionalLight03 = new THREE.DirectionalLight(0xffffff, 0.05);
+    // directionalLight03.position.set(21.8, 3.9, 3.9);
+    // directionalLight03.scale.set(1, 1, 1);
+    // directionalLight03.rotation.set(0.3, -0.3, -0.1);
+    // directionalLight03.castShadow = true;
+    // directionalLight03.shadow.camera.far = 300;
+    // directionalLight03.shadow.mapSize.set(1024, 1024);
+    // directionalLight03.shadow.normalBias = 0.05; //CURVE SURFACES
+    // //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
+    // this.scene.add(directionalLight03);
+
+    // const directionalLightHelper03 = new THREE.DirectionalLightHelper(
+    //   directionalLight03,
+    //   2
+    // );
+    // this.scene.add(directionalLightHelper03);
+    // directionalLightHelper03.visible = false;
+
+    // this.lights.push({
+    //   light: directionalLight03,
+    //   helper: directionalLightHelper03,
+    // });
   }
 
   updateAllMaterials() {
@@ -212,7 +547,7 @@ class Model3dScene {
       });
 
     this.guiBgFolder
-      .add(that.debugObject.scene, 'environmentMap')
+      .add(that.debugObject.scene, 'showEnvironmentMap')
       .onChange((value) => {
         if (value) {
           this.scene.background = this.environmentMap;
@@ -324,6 +659,36 @@ class Model3dScene {
     });
 
     this.guiFolderLights.close();
+
+    //DEBUG BLOOM
+    const bloomFolder = this.gui.addFolder('Bloom');
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'threshold', 0.0, 1.0, 0.1)
+      .onChange(function (value) {
+        that.bloomPass.threshold = Number(value);
+      });
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'strength', 0.0, 3.0, 0.1)
+      .onChange(function (value) {
+        that.bloomPass.strength = Number(value);
+      });
+
+    bloomFolder
+      .add(that.debugObject.bloom, 'radius', 0.0, 1.0, 0.1)
+      .step(0.01)
+      .onChange(function (value) {
+        that.bloomPass.radius = Number(value);
+      });
+
+    const toneMappingFolder = bloomFolder.addFolder('tone mapping');
+
+    toneMappingFolder
+      .add(that.debugObject.bloom, 'exposure', 0.1, 2, 0.1)
+      .onChange(function (value) {
+        that.renderer.toneMappingExposure = Math.pow(value, 4.0);
+      });
   }
 
   addCubeTexture(n) {
@@ -337,7 +702,7 @@ class Model3dScene {
       '/assets/textures/' + n + '/nz.png',
     ]);
     this.environmentMap.encoding = THREE.sRGBEncoding;
-    if (this.debugObject.scene.environmentMap) {
+    if (this.debugObject.scene.showEnvironmentMap) {
       this.scene.background = this.environmentMap;
     }
     this.scene.environment = this.environmentMap;
@@ -350,28 +715,48 @@ class Model3dScene {
     this.renderer.render(this.scene, this.camera);
 
     if (this.controls.enabled) this.controls.update();
+
+    this.composer.render();
+
+    if (this.debug) {
+      this.stats.update();
+    }
   }
 }
 
 export default function Model3d(props) {
-  const { debug } = props;
+  const { debug, show } = props;
   const canvasRef = useRef();
+  const model3dOverlay = useRef();
   const flag = useRef();
+  const [model3d, setModel3D] = useState(null);
 
   useEffect(() => {
     if (flag.current) return;
     flag.current = true;
-    const model3d = new Model3dScene({
+    const _model3d = new Model3dScene({
       dom: canvasRef.current,
+      overlay: model3dOverlay.current,
       debug,
     });
-    document.model3d = model3d;
+    document.model3d = _model3d;
+    setModel3D(_model3d);
     // Limpia los recursos al desmontar el componente
     return () => {
-      model3d.renderer.dispose();
-      model3d.scene.remove(model3d.cube);
+      _model3d.renderer.dispose();
     };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  useEffect(() => {
+    if (show && model3d) {
+      model3d.show();
+    }
+  }, [show, model3d]);
+
+  return (
+    <>
+      <div className="Model3dOverlay" ref={model3dOverlay}></div>
+      <canvas className="Model3d" ref={canvasRef} />
+    </>
+  );
 }

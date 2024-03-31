@@ -1,0 +1,296 @@
+.home{
+    display: block;
+    padding-top:64px ;
+}
+.mainBg{
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    filter: blur(120px);
+    -webkit-filter: blur(120px);
+    
+}
+.ellipse{
+    position: relative;
+    width: 200%;
+    height: 160%;
+    border-radius: 100%;
+    background: #6B5D93;
+    transform: rotate(-50deg) translate(-35%, -80%);
+}
+.section{
+    display: flex;
+    flex-direction: column;
+    justify-content:flex-start;
+    align-items: flex-start;
+    height: calc(100vh - 64px);
+    /* height: 200vh; */
+    /* padding:120px 20px 0 20px; */
+    padding: 0 20px;
+}
+
+.section.large{
+    height: calc(300vh - 64px);
+}
+
+.section.contentRight{
+    align-items: flex-end;
+}
+
+.section01 .title{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/*INTRO*/
+.intro .section{
+    opacity: 1;
+}
+.intro .mainBg{
+    opacity: 0;
+}
+.intro .section01{
+    opacity: 1;
+    display: block;
+}
+.intro .section01 .subtitle{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.intro .section01 .description{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.intro .section01 .cta{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.intro .section01 .title span{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.intro .section01 .title .primaryText span{
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.intro .section01 .title .primaryText{
+    opacity: 1;
+}
+
+.intro .section01 .title .primaryText .letterTitle{
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+.intro .section01 .title .primaryText .letterTitle01{
+    animation: letterTitleAnim 0.25s linear 0.5s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle02{
+    animation: letterTitleAnim 0.25s linear 0.75s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle03{
+    animation: letterTitleAnim 0.25s linear 1.0s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle04{
+    animation: letterTitleAnim 0.25s linear 1.25s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle05{
+    animation: letterTitleAnim 0.25s linear 1.5s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle06{
+    animation: letterTitleAnim 0.25s linear 1.75s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle07{
+    animation: letterTitleAnim 0.25s linear 2.0s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle08{
+    animation: letterTitleAnim 0.25s linear 2.25s forwards;
+}
+.intro .section01 .title .primaryText .letterTitle09{
+    animation: letterTitleAnim 0.25s linear 2.5s forwards;
+}
+
+@keyframes letterTitleAnim {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+.intro .section01 .title .line02 {
+    animation: linesAnim 0.75s linear 3.0s forwards;
+}
+
+.intro .section01 .title .line03 {
+    animation: linesAnim 0.75s linear 3.75s forwards;
+}
+
+@keyframes linesAnim {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+.intro .section01 .sectionInfoAbsolute{
+    position: absolute;
+    top:40%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    animation: sectionInfoAbsoluteAnim 0.75s linear 4.5s forwards; 
+}
+
+@keyframes sectionInfoAbsoluteAnim {
+    0%{
+        position: absolute;
+        top:40%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+    100%{
+        position: absolute;
+        top:40%;
+        left: 0%;
+        transform: translate(0%,-50%);
+    }
+}
+
+.intro .mainBg{
+    animation: headerFadeInAnim 0.5s linear 6.25s forwards;
+}
+
+.intro .section01 .subtitle{
+    animation: headerFadeInAnim 0.5s linear 5.25s forwards;
+}
+
+.intro .section01 .description{
+    animation: headerFadeInAnim 0.5s linear 5.75s forwards;
+}
+
+.intro .section01 .cta{
+    animation: headerFadeInAnim 0.5s linear 6.25s forwards;
+}
+
+@keyframes headerFadeInAnim {
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+/*END INTRO*/
+
+.sectionInfo{
+    /* border: solid 1px red; */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: sticky;
+    top:64px;
+}
+
+.section01 .sectionInfo{
+    position: relative;
+}
+
+.subtitle{
+    color: var(--color-white);
+    font-size: clamp(10px, 1vw, 12px);
+    max-width: 500px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    line-height: 90%;
+    text-transform: uppercase;
+    padding-left: 5px;
+}
+
+@media only screen and (max-width: 599px) {
+    .subtitle {
+        padding: 10px 10px 6px 10px;
+        background: rgb(92,65,109);
+        background: -moz-linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        background: -webkit-linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        background: linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5c416d",endColorstr="#000000",GradientType=1); 
+        width: fit-content;
+    }
+}
+
+.title{
+    color: var(--color-white);
+    font-size: clamp(20px, 8vw, 70px);
+    text-transform: uppercase;
+    max-width: 400px;
+    font-weight: 600;
+    line-height: 90%;
+}
+
+.title.medium{
+    font-size: clamp(20px, 4vw, 50px);
+}
+
+.description{
+    color: var(--color-white);
+    font-size: clamp(16px, 2.5vw, 24px);
+    max-width: 500px;
+    margin-top: 20px;
+    font-weight: 400;
+    line-height: 90%;
+    padding-left: 5px;
+}
+
+@media only screen and (max-width: 599px) {
+    .description {
+        padding: 10px 10px 10px 10px;
+        background: rgb(92,65,109);
+        background: -moz-linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        background: -webkit-linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        background: linear-gradient(93deg, rgba(92,65,109,1) 0%, rgba(0,0,0,0.6236694506904324) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#5c416d",endColorstr="#000000",GradientType=1); 
+        width: fit-content;
+    }
+}
+
+.primaryText{
+    color: #24eafb;
+}
+
+.cta{
+    margin-top: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.cta button{
+    background-color: #24eafb;
+    color: #3e4242;
+    font-weight: 600;
+    border-bottom: solid 3px #13b0be;
+}
+
+.bgMain{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    background-color: #000000;
+}
+
+.bgMain img{
+    width: 100%;
+    height: auto;
+}

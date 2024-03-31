@@ -13,10 +13,55 @@
   padding: 0;
   box-sizing: border-box;
 }
+html{
+  scroll-behavior: smooth;
+}
 body {
   font-family: var(--primary-font), sans-serif;
+  scroll-behavior: smooth;
+  background-color: #000;
+  min-height: 100vh;
 }
-
 
 .dg.ac{z-index: 99!important;display: block;}
 
+.Model3d{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  /* transition:all 0.5s ease-in-out; */
+  /* animation: Model3dAnim 0.5s linear 6.75s forwards; */
+}
+
+.Model3dOverlay{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 2;
+  opacity: 1;
+  transition:all 0.5s ease-in-out;
+  /* animation: Model3dOverlayAnim 0.5s linear 6.75s forwards; */
+}
+
+.Model3dOverlay.hide{
+  opacity: 0;
+}
+
+@keyframes Model3dOverlayAnim {
+  0%{
+      opacity: 1;
+  }
+  100%{
+      opacity: 0;
+  }
+}
+
+/* .title,.description{
+  opacity: 0;
+} */
