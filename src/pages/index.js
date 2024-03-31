@@ -170,7 +170,13 @@ export default function Home() {
                   Contact us today!
                 </p>
                 <div className={`${styles.cta} cta`}>
-                  <Button onClick={() => {}}>Email us</Button>
+                  <Button
+                    onClick={() => {
+                      location.href = 'mailto:ventas@example.com';
+                    }}
+                  >
+                    Email us
+                  </Button>
                 </div>
               </div>
             </div>
