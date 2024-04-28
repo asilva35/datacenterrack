@@ -4,7 +4,10 @@
     backdrop-filter: none;
     top:-64px;
     position: fixed;
-    animation: navBarAnim 0.5s linear 6.75s forwards;
+}
+
+.Navbar.show{
+    animation: navBarAnim 0.5s linear 0.5s forwards;
 }
 
 @keyframes navBarAnim {

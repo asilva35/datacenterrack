@@ -264,7 +264,7 @@
 }
 
 .primaryText{
-    color: #24eafb;
+    color: #9d54d5;
 }
 
 .cta{
@@ -274,10 +274,10 @@
 }
 
 .cta button{
-    background-color: #24eafb;
-    color: #3e4242;
+    background-color: #9d54d5;
+    color: #ffffff;
     font-weight: 600;
-    border-bottom: solid 3px #13b0be;
+    border-bottom: solid 3px #5f2c86;
 }
 
 .bgMain{

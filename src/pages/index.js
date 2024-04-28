@@ -3,17 +3,16 @@ import Metaheader from '@/components/Metaheader';
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
-import { SplitText } from '@rigo-m/react-split-text';
 
 import { Button } from '@nextui-org/react';
-import Image from 'next/image';
 
-const Model3d = dynamic(() => import('@/components/Model3d'), {
+const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
   ssr: false,
 });
 
 export default function Home() {
   const [show3dModel, setShow3dModel] = useState(false);
+  const [showTopBar, setShowTopBar] = useState(false);
   useEffect(() => {
     if (window !== undefined) {
       window.scrollTo(0, 0);
@@ -22,6 +21,7 @@ export default function Home() {
   useEffect(() => {
     let timer = setTimeout(() => {
       setShow3dModel(true);
+      setShowTopBar(true);
     }, 7000);
     return () => {
       clearTimeout(timer);
@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <>
       <Metaheader />
-      <Layout>
+      <Layout showTopBar={showTopBar}>
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
             <div

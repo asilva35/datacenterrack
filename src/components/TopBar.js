@@ -1,6 +1,6 @@
 import styles from '@/styles/TopBar.module.css';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect } from 'react';
 import MainNavigation from '@/components/MainNavigation';
 import {
   Link,
@@ -12,12 +12,14 @@ import {
 } from '@nextui-org/react';
 
 export default function TopBar(props) {
+  const { showTopBar } = props;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
   return (
     <Navbar
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
-      className={`${styles.Navbar}`}
+      className={`${styles.Navbar} ${showTopBar ? styles.show : ''}`}
     >
       <NavbarBrand>
         <Link href="/">

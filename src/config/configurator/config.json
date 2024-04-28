@@ -1,0 +1,46 @@
+{
+    "scene":{
+        "antialias": true,
+        "alpha": false,
+        "showEnvironmentMap": true,
+        "bgColor": "#070707",
+        "bgMesh":{
+            "rotation": false,
+            "scale": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        }
+    },
+    "camera":{
+        "fov":50,
+        "near":0.1,
+        "far":1000,
+        "position":{
+            "x":7.532014622239164,
+            "y":2.861268617963777,
+            "z":-3.801668875471335
+        },
+        "target":{
+            "x":-1.913538840872328,
+            "y":2.4208925714067258,
+            "z":1.70057377010336
+        }
+    },
+    "bloom":{
+        "threshold": 1,
+        "strength": 0,
+        "radius": 0,
+        "exposure": 1.3
+    },
+    "floor":{
+        "color": "#29282d",
+        "roughness": 0.72,
+        "clearcoat": 1,
+        "clearcoatRoughness": 0.19,
+        "metalness": 1,
+        "width": 500,
+        "height": 500
+    }
+}
