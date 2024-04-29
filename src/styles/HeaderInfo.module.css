@@ -1,0 +1,58 @@
+.HeaderInfo{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wrapper{
+    padding: 10px;
+    max-width: 300px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.title{
+    font-family: var(--secondary-font);
+    color:#BEB3C0;
+    font-size: 150px;
+    line-height: 150px;
+}
+
+.subtitle{
+    font-family: var(--secondary-font);
+    color:#BEB3C0;
+    font-size: 50px;
+    line-height: 50px;
+}
+
+.actions{
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.viewInfo{
+    color: #000000;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: solid 1px #000;
+    width: fit-content;
+    font-size: 14px;
+    line-height: 14px;
+    cursor: pointer;
+}
+
+.arrow{
+    width: 61px;
+    height: 16px;
+    cursor: pointer;
+}

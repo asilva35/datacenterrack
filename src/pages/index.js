@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <>
       <Metaheader />
-      <Layout showTopBar={showTopBar} theme="dark">
+      <Layout showTopBar={showTopBar} theme="dark" navStyle="01">
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
             <div

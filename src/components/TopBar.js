@@ -12,14 +12,16 @@ import {
 } from '@nextui-org/react';
 
 export default function TopBar(props) {
-  const { showTopBar, theme } = props;
+  const { showTopBar, theme, navStyle } = props;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
     <Navbar
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
-      className={`${styles.Navbar} ${showTopBar ? styles.show : ''}`}
+      className={`${styles.Navbar} ${showTopBar ? styles.show : ''} ${
+        styles[theme]
+      }`}
     >
       <NavbarBrand>
         <Link href="/">
@@ -36,29 +38,34 @@ export default function TopBar(props) {
           />
         </Link>
       </NavbarBrand>
-      <NavbarMenuToggle
-        aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-        className="hide-md hide-lg hide-xl"
-        icon={
-          <Image
-            src={
-              theme === 'dark'
-                ? `/assets/images/hamburguer-menu-light.svg`
-                : `/assets/images/hamburguer-menu-dark.svg`
-            }
-            width={34}
-            height={20}
-            alt="Menu"
-          />
-        }
-      />
-      <NavbarContent
-        as="div"
-        justify="end"
-        className="hide-xss hide-xs hide-sm"
-      >
-        <MainNavigation direction="horizontal" theme={theme} />
+      <NavbarContent as="div" className={`${styles.LabelMenu}`}>
+        Menu
+        <NavbarMenuToggle
+          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+          className={navStyle === '01' ? `hide-md hide-lg hide-xl` : ''}
+          icon={
+            <Image
+              src={
+                theme === 'dark'
+                  ? `/assets/images/hamburguer-menu-light.svg`
+                  : `/assets/images/hamburguer-menu-dark.svg`
+              }
+              width={34}
+              height={20}
+              alt="Menu"
+            />
+          }
+        />
       </NavbarContent>
+      {navStyle === '01' && (
+        <NavbarContent
+          as="div"
+          justify="end"
+          className="hide-xss hide-xs hide-sm"
+        >
+          <MainNavigation direction="horizontal" theme={theme} />
+        </NavbarContent>
+      )}
       <NavbarMenu className={`${styles.NavbarMenu}`}>
         <div className={`${styles.MainNavigationCNT}`}>
           <MainNavigation direction="vertical" theme={theme} />

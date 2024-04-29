@@ -5,10 +5,8 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import configJson from '@/config/configurator/config.json';
-
-import styles from '@/styles/Home.module.css';
-
-import { Button } from '@nextui-org/react';
+import TextRotated from '@/components/configurator/TextRotated';
+import HeaderInfo from '@/components/configurator/HeaderInfo';
 
 const Configurator3d = dynamic(
   () => import('@/components/Models3D/Configurator3d'),
@@ -45,13 +43,9 @@ export default function Configurator() {
   return (
     <>
       <Metaheader />
-      <Layout showTopBar={showTopBar} theme="light">
-        {/* <header>
-          <div
-            id="header"
-            className={`${styles.section} ${styles.section01} section section-01`}
-          ></div>
-        </header> */}
+      <Layout showTopBar={showTopBar} theme="light" navStyle="02">
+        <TextRotated />
+        <HeaderInfo />
       </Layout>
       <Configurator3d debug={showDebug} show={show3dModel} config={config} />
       <div className="empty"></div>
