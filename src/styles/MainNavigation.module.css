@@ -18,14 +18,26 @@
     color:#EB00FF;
 }
 
-.link{
+.MainNavigation.dark .link{
     color: #D7D7D7;
     font-weight: 300;
     cursor: pointer;
 }
 
-.selected{
+.MainNavigation.dark .selected{
     font-weight: 400;
     color: #FFFFFF;
+    cursor: pointer;
+}
+
+.MainNavigation.light .link{
+    color: #1d1c1c;
+    font-weight: 300;
+    cursor: pointer;
+}
+
+.MainNavigation.light .selected{
+    font-weight: 400;
+    color: #000000;
     cursor: pointer;
 }

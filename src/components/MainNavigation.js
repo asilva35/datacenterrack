@@ -7,7 +7,7 @@ import styles from '@/styles/MainNavigation.module.css';
 import { useRouter } from 'next/router';
 
 export default function MainNavigation(props) {
-  const { direction } = props;
+  const { direction, theme } = props;
   const [currentPage, setCurrentPage] = React.useState('#header');
   const router = useRouter();
   const onClickMenu = (path) => {
@@ -22,7 +22,9 @@ export default function MainNavigation(props) {
   };
 
   return (
-    <div className={`${styles.MainNavigation} ${styles[direction]}`}>
+    <div
+      className={`${styles.MainNavigation} ${styles[direction]} ${styles[theme]}`}
+    >
       <NavbarItem>
         <Link
           onClick={() => {

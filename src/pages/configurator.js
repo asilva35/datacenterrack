@@ -45,7 +45,7 @@ export default function Configurator() {
   return (
     <>
       <Metaheader />
-      <Layout showTopBar={showTopBar}>
+      <Layout showTopBar={showTopBar} theme="light">
         {/* <header>
           <div
             id="header"

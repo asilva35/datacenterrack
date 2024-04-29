@@ -84,12 +84,23 @@ body {
   height: calc(100% - 50px);
 }
 
-#debug_modal_config_export_button_close{
+#debug_modal_config_export_actions{
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+#debug_modal_config_export_button_close,#debug_modal_config_export_button_copy{
   height: 20px;
   height: 30px;
   background: #d2d1d1;
   padding: 5px 10px;
   border-radius: 5px;
+}
+
+#debug_modal_config_export_button_copy{
+  background: #060ea5;
+  color:#fff;
 }
 
 

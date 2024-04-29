@@ -5,8 +5,6 @@ export class Debug {
   constructor(options) {
     this.debugObject = options.debugObject;
     this.camera = options.camera;
-    this.ambientLight = options.ambientLight;
-    this.lights = options.lights;
     this.bloomPass = options.bloomPass;
     this.renderer = options.renderer;
     this.scene = options.scene;
@@ -32,17 +30,24 @@ export class Debug {
   addModalExport() {
     const modal = document.createElement('div');
     const modal_body = document.createElement('div');
+    const modal_actions = document.createElement('div');
     const button_close = document.createElement('button');
+    const button_copy = document.createElement('button');
     const textarea = document.createElement('textarea');
     modal.id = 'debug_modal_config_export';
     modal_body.id = 'debug_modal_config_export_body';
+    modal_actions.id = 'debug_modal_config_export_actions';
     button_close.id = 'debug_modal_config_export_button_close';
     button_close.innerHTML = 'Close';
+    button_copy.id = 'debug_modal_config_export_button_copy';
+    button_copy.innerHTML = 'Copy';
     textarea.id = 'debug_modal_config_export_txt';
     textarea.readOnly = true;
     textarea.resizable = false;
     modal_body.appendChild(textarea);
-    modal_body.appendChild(button_close);
+    modal_actions.appendChild(button_copy);
+    modal_actions.appendChild(button_close);
+    modal_body.appendChild(modal_actions);
     modal.appendChild(modal_body);
     document.body.appendChild(modal);
 
@@ -53,6 +58,19 @@ export class Debug {
         id === 'debug_modal_config_export_button_close'
       ) {
         modal.classList.remove('show');
+      }
+      if (id === 'debug_modal_config_export_button_copy') {
+        var copyText = document.getElementById('debug_modal_config_export_txt');
+
+        // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+
+        // Alert the copied text
+        alert('Copied to clipboard');
       }
     });
   }
@@ -81,6 +99,11 @@ export class Debug {
       });
 
     const colors = {
+      color: [
+        this.bgMaterial.uniforms.uColor.value.r * 255,
+        this.bgMaterial.uniforms.uColor.value.g * 255,
+        this.bgMaterial.uniforms.uColor.value.b * 255,
+      ],
       brightness: [
         this.bgMaterial.uniforms.uBrightness.value.r * 255,
         this.bgMaterial.uniforms.uBrightness.value.g * 255,
@@ -128,6 +151,17 @@ export class Debug {
     this.guiMaterialFolder
       .add(this.bgMaterial.uniforms.uOpacity, 'value', 0, 1, 0.01)
       .name('Opacity');
+
+    this.guiMaterialFolder
+      .addColor(colors, 'color')
+      .onChange((value) => {
+        this.bgMaterial.uniforms.uColor.value = new THREE.Color(
+          value[0] / 255,
+          value[1] / 255,
+          value[2] / 255
+        );
+      })
+      .name('Color');
 
     this.guiMaterialFolder
       .addColor(colors, 'brightness')
@@ -194,40 +228,42 @@ export class Debug {
   }
 
   debugFloor() {
-    this.guiBgFolder = this.gui.addFolder('Floor');
-    this.guiBgFolder
-      .addColor(this.debugObject.floor, 'color')
-      .onChange((value) => {
-        this.floor.material.color = new THREE.Color(value);
-      });
+    if (this.debugObject.floor && this.debugObject.floor.active) {
+      this.guiBgFolder = this.gui.addFolder('Floor');
+      this.guiBgFolder
+        .addColor(this.debugObject.floor, 'color')
+        .onChange((value) => {
+          this.floor.material.color = new THREE.Color(value);
+        });
 
-    this.guiBgFolder
-      .add(this.debugObject.floor, 'roughness', 0, 1, 0.01)
-      .onChange((value) => {
-        this.floor.material.roughness = value;
-      })
-      .name('Roughness');
+      this.guiBgFolder
+        .add(this.debugObject.floor, 'roughness', 0, 1, 0.01)
+        .onChange((value) => {
+          this.floor.material.roughness = value;
+        })
+        .name('Roughness');
 
-    this.guiBgFolder
-      .add(this.debugObject.floor, 'metalness', 0, 1, 0.01)
-      .onChange((value) => {
-        this.floor.material.metalness = value;
-      })
-      .name('Metalness');
+      this.guiBgFolder
+        .add(this.debugObject.floor, 'metalness', 0, 1, 0.01)
+        .onChange((value) => {
+          this.floor.material.metalness = value;
+        })
+        .name('Metalness');
 
-    this.guiBgFolder
-      .add(this.debugObject.floor, 'clearcoat', 0, 1, 0.01)
-      .onChange((value) => {
-        this.floor.material.clearcoat = value;
-      })
-      .name('Clearcoat');
+      this.guiBgFolder
+        .add(this.debugObject.floor, 'clearcoat', 0, 1, 0.01)
+        .onChange((value) => {
+          this.floor.material.clearcoat = value;
+        })
+        .name('Clearcoat');
 
-    this.guiBgFolder
-      .add(this.debugObject.floor, 'clearcoatRoughness', 0, 1, 0.01)
-      .onChange((value) => {
-        this.floor.material.clearcoatRoughness = value;
-      })
-      .name('ClearcoatRoughness');
+      this.guiBgFolder
+        .add(this.debugObject.floor, 'clearcoatRoughness', 0, 1, 0.01)
+        .onChange((value) => {
+          this.floor.material.clearcoatRoughness = value;
+        })
+        .name('ClearcoatRoughness');
+    }
   }
 
   debugCamera() {
@@ -298,43 +334,153 @@ export class Debug {
 
   debugLights() {
     /**Debug Lights */
-    this.guiFolderLights = this.gui.addFolder('Lights');
+    if (this.debugObject.lights && this.debugObject.lights.length > 0) {
+      this.guiFolderLights = this.gui.addFolder('Lights');
+      this.debugObject.lights.forEach((l) => {
+        if (l.type === 'AmbientLight') {
+          this.scene.traverse((child) => {
+            if (child.name === l.name) {
+              const color = {
+                value: [
+                  child.color.r * 255,
+                  child.color.g * 255,
+                  child.color.b * 255,
+                ],
+              };
+              const folderAmbientLight =
+                this.guiFolderLights.addFolder('Ambient Light');
+              folderAmbientLight.add(child, 'visible').name('Visible');
+              folderAmbientLight
+                .add(child, 'intensity', 0, 50, 0.1)
+                .name('Intensity');
+              folderAmbientLight
+                .addColor(color, 'value')
+                .onChange((value) => {
+                  child.color = new THREE.Color(
+                    value[0] / 255,
+                    value[1] / 255,
+                    value[2] / 255
+                  );
+                })
+                .name('Color');
+            }
+          });
+        }
+        if (l.type === 'DirectionalLight') {
+          this.scene.traverse((child) => {
+            if (child.name === l.name) {
+              const color = {
+                value: [
+                  child.color.r * 255,
+                  child.color.g * 255,
+                  child.color.b * 255,
+                ],
+              };
+              const folderLight = this.guiFolderLights.addFolder(l.label);
+              folderLight.add(child, 'visible').name('Visible');
+              folderLight
+                .add(l, 'helper')
+                .onChange((value) => {
+                  this.scene.traverse((_child) => {
+                    if (_child.name === l.name + 'Helper') {
+                      _child.visible = value;
+                    }
+                  });
+                })
+                .name('Helper');
+              folderLight.add(child, 'intensity', 0, 50, 0.1).name('Intensity');
+              folderLight
+                .addColor(color, 'value')
+                .onChange((value) => {
+                  child.color = new THREE.Color(
+                    value[0] / 255,
+                    value[1] / 255,
+                    value[2] / 255
+                  );
+                })
+                .name('Color');
 
-    const folderAmbientLight = this.guiFolderLights.addFolder('Ambient Light');
-    folderAmbientLight.add(this.ambientLight, 'visible').name('Visible');
-    folderAmbientLight
-      .add(this.ambientLight, 'intensity', 0, 50, 0.1)
-      .name('Intensity');
-    //folderAmbientLight.add(this.ambientLight, 'color').name('Color');
+              folderLight.add(child, 'castShadow').name('Cast Shadow');
+              folderLight
+                .add(child.shadow.camera, 'far', 0, 1000, 0.1)
+                .name('Camera Far');
+              folderLight
+                .add({ x: Math.log2(child.shadow.mapSize.x) }, 'x', 1, 12, 1)
+                .onChange((value) => {
+                  child.shadow.mapSize.x = Math.pow(2, value);
+                })
+                .name('Map Size X');
+              folderLight
+                .add({ y: Math.log2(child.shadow.mapSize.y) }, 'y', 1, 12, 1)
+                .onChange((value) => {
+                  child.shadow.mapSize.y = Math.pow(2, value);
+                })
+                .name('Map Size Y');
+              folderLight
+                .add(child.shadow, 'normalBias', 0, 1, 0.01)
+                .name('Normal Bias');
+              folderLight
+                .add(child.position, 'x', -100, 100, 0.1)
+                .name('Position X');
+              folderLight
+                .add(child.position, 'y', -100, 100, 0.1)
+                .name('Position Y');
+              folderLight
+                .add(child.position, 'z', -100, 100, 0.1)
+                .name('Position Z');
 
-    this.lights.forEach((light, index) => {
-      const folderLight = this.guiFolderLights.addFolder(`Light ${index + 1}`);
-      folderLight.add(light.helper, 'visible').name('Helper');
-      folderLight.add(light.light, 'intensity', 0, 5, 0.05).name('Intensity');
-      folderLight
-        .add(light.light.position, 'x', -50, 50, 0.1)
-        .name('Position X');
-      folderLight
-        .add(light.light.position, 'y', -50, 50, 0.1)
-        .name('Position Y');
-      folderLight
-        .add(light.light.position, 'z', -50, 50, 0.1)
-        .name('Position Z');
-      folderLight.add(light.light.scale, 'x', 0, 5, 0.1).name('Scale X');
-      folderLight.add(light.light.scale, 'y', 0, 5, 0.1).name('Scale Y');
-      folderLight.add(light.light.scale, 'z', 0, 5, 0.1).name('Scale Z');
-      folderLight
-        .add(light.light.rotation, 'x', -Math.PI, Math.PI, 0.1)
-        .name('Rotate X');
-      folderLight
-        .add(light.light.rotation, 'y', -Math.PI, Math.PI, 0.1)
-        .name('Rotate Y');
-      folderLight
-        .add(light.light.rotation, 'z', -Math.PI, Math.PI, 0.1)
-        .name('Rotate Z');
-    });
+              folderLight.add(child.scale, 'x', 0, 5, 0.1).name('Scale X');
+              folderLight.add(child.scale, 'y', 0, 5, 0.1).name('Scale Y');
+              folderLight.add(child.scale, 'z', 0, 5, 0.1).name('Scale Z');
 
-    this.guiFolderLights.close();
+              folderLight
+                .add(child.rotation, 'x', -Math.PI, Math.PI, 0.1)
+                .name('Rotation X');
+              folderLight
+                .add(child.rotation, 'y', -Math.PI, Math.PI, 0.1)
+                .name('Rotation Y');
+              folderLight
+                .add(child.rotation, 'z', -Math.PI, Math.PI, 0.1)
+                .name('Rotation Z');
+            }
+          });
+        }
+      });
+    }
+    // this.guiFolderLights = this.gui.addFolder('Lights');
+    // const folderAmbientLight = this.guiFolderLights.addFolder('Ambient Light');
+    // folderAmbientLight.add(this.ambientLight, 'visible').name('Visible');
+    // folderAmbientLight
+    //   .add(this.ambientLight, 'intensity', 0, 50, 0.1)
+    //   .name('Intensity');
+    // //folderAmbientLight.add(this.ambientLight, 'color').name('Color');
+    // this.lights.forEach((light, index) => {
+    //   const folderLight = this.guiFolderLights.addFolder(`Light ${index + 1}`);
+    //   folderLight.add(light.helper, 'visible').name('Helper');
+    //   folderLight.add(light.light, 'intensity', 0, 5, 0.05).name('Intensity');
+    //   folderLight
+    //     .add(light.light.position, 'x', -50, 50, 0.1)
+    //     .name('Position X');
+    //   folderLight
+    //     .add(light.light.position, 'y', -50, 50, 0.1)
+    //     .name('Position Y');
+    //   folderLight
+    //     .add(light.light.position, 'z', -50, 50, 0.1)
+    //     .name('Position Z');
+    //   folderLight.add(light.light.scale, 'x', 0, 5, 0.1).name('Scale X');
+    //   folderLight.add(light.light.scale, 'y', 0, 5, 0.1).name('Scale Y');
+    //   folderLight.add(light.light.scale, 'z', 0, 5, 0.1).name('Scale Z');
+    //   folderLight
+    //     .add(light.light.rotation, 'x', -Math.PI, Math.PI, 0.1)
+    //     .name('Rotate X');
+    //   folderLight
+    //     .add(light.light.rotation, 'y', -Math.PI, Math.PI, 0.1)
+    //     .name('Rotate Y');
+    //   folderLight
+    //     .add(light.light.rotation, 'z', -Math.PI, Math.PI, 0.1)
+    //     .name('Rotate Z');
+    // });
+    // this.guiFolderLights.close();
   }
 
   debugBloom() {
@@ -373,19 +519,21 @@ export class Debug {
   getCurrentConfig() {
     const that = this;
 
-    this.gui.add(
-      {
-        getCurrentConfig: function () {
-          const modal = document.querySelector('#debug_modal_config_export');
-          modal.classList.add('show');
-          const textarea = modal.querySelector(
-            '#debug_modal_config_export_txt'
-          );
-          textarea.value = JSON.stringify(that.debugObject, null, ' ');
-          console.log(that.debugObject);
+    this.gui
+      .add(
+        {
+          getCurrentConfig: function () {
+            const modal = document.querySelector('#debug_modal_config_export');
+            modal.classList.add('show');
+            const textarea = modal.querySelector(
+              '#debug_modal_config_export_txt'
+            );
+            textarea.value = JSON.stringify(that.debugObject, null, ' ');
+            console.log(that.debugObject);
+          },
         },
-      },
-      'getCurrentConfig'
-    );
+        'getCurrentConfig'
+      )
+      .name('Show Config');
   }
 }

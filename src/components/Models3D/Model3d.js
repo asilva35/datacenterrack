@@ -17,6 +17,8 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import styles from '@/styles/Model3d.module.css';
+
 class Model3dScene {
   constructor(options) {
     const that = this;
@@ -65,6 +67,7 @@ class Model3dScene {
     this.container = options.dom;
     this.overlay = options.overlay;
     this.debug = options.debug;
+    this.styles = options.styles;
 
     this.camera.lookAt(
       new this.THREE.Vector3(
@@ -326,6 +329,7 @@ class Model3dScene {
   show() {
     const camera_position = { ...this.camera.position };
     const control_target = { ...this.controls.target };
+    console.log(this.controls.target);
     this.controls.enabled = false;
     this.camera.position.set(
       -1.2615372011680765,
@@ -339,7 +343,7 @@ class Model3dScene {
     );
     this.controls.update();
     this.controls.enabled = true;
-    this.overlay.classList.add('hide');
+    this.overlay.classList.add(styles.hide);
     gsap.to(this.camera.position, {
       x: camera_position.x,
       y: camera_position.y,
@@ -661,34 +665,36 @@ class Model3dScene {
     this.guiFolderLights.close();
 
     //DEBUG BLOOM
-    const bloomFolder = this.gui.addFolder('Bloom');
+    if (that.debugObject.bloom) {
+      const bloomFolder = this.gui.addFolder('Bloom');
 
-    bloomFolder
-      .add(that.debugObject.bloom, 'threshold', 0.0, 1.0, 0.1)
-      .onChange(function (value) {
-        that.bloomPass.threshold = Number(value);
-      });
+      bloomFolder
+        .add(that.debugObject.bloom, 'threshold', 0.0, 1.0, 0.1)
+        .onChange(function (value) {
+          that.bloomPass.threshold = Number(value);
+        });
 
-    bloomFolder
-      .add(that.debugObject.bloom, 'strength', 0.0, 3.0, 0.1)
-      .onChange(function (value) {
-        that.bloomPass.strength = Number(value);
-      });
+      bloomFolder
+        .add(that.debugObject.bloom, 'strength', 0.0, 3.0, 0.1)
+        .onChange(function (value) {
+          that.bloomPass.strength = Number(value);
+        });
 
-    bloomFolder
-      .add(that.debugObject.bloom, 'radius', 0.0, 1.0, 0.1)
-      .step(0.01)
-      .onChange(function (value) {
-        that.bloomPass.radius = Number(value);
-      });
+      bloomFolder
+        .add(that.debugObject.bloom, 'radius', 0.0, 1.0, 0.1)
+        .step(0.01)
+        .onChange(function (value) {
+          that.bloomPass.radius = Number(value);
+        });
 
-    const toneMappingFolder = bloomFolder.addFolder('tone mapping');
+      const toneMappingFolder = bloomFolder.addFolder('tone mapping');
 
-    toneMappingFolder
-      .add(that.debugObject.bloom, 'exposure', 0.1, 2, 0.1)
-      .onChange(function (value) {
-        that.renderer.toneMappingExposure = Math.pow(value, 4.0);
-      });
+      toneMappingFolder
+        .add(that.debugObject.bloom, 'exposure', 0.1, 2, 0.1)
+        .onChange(function (value) {
+          that.renderer.toneMappingExposure = Math.pow(value, 4.0);
+        });
+    }
   }
 
   addCubeTexture(n) {
@@ -710,14 +716,10 @@ class Model3dScene {
   // Función para actualizar la escena
   tick() {
     requestAnimationFrame(this.tick.bind(this));
-
     // Renderiza la escena con la cámara
     this.renderer.render(this.scene, this.camera);
-
     if (this.controls.enabled) this.controls.update();
-
     this.composer.render();
-
     if (this.debug) {
       this.stats.update();
     }
@@ -738,12 +740,13 @@ export default function Model3d(props) {
       dom: canvasRef.current,
       overlay: model3dOverlay.current,
       debug,
+      styles,
     });
     document.model3d = _model3d;
     setModel3D(_model3d);
     // Limpia los recursos al desmontar el componente
     return () => {
-      _model3d.renderer.dispose();
+      if (_model3d.renderer) _model3d.renderer.dispose();
     };
   }, []);
 
@@ -755,8 +758,8 @@ export default function Model3d(props) {
 
   return (
     <>
-      <div className="Model3dOverlay" ref={model3dOverlay}></div>
-      <canvas className="Model3d" ref={canvasRef} />
+      <div className={styles.Model3dOverlay} ref={model3dOverlay}></div>
+      <canvas className={styles.Model3d} ref={canvasRef} />
     </>
   );
 }

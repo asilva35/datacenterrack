@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
 import { Button } from '@nextui-org/react';
+import { useRouter } from 'next/router';
 
 const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
   ssr: false,
@@ -13,6 +14,13 @@ const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
 export default function Home() {
   const [show3dModel, setShow3dModel] = useState(false);
   const [showTopBar, setShowTopBar] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    if (router.query.debug) {
+      setShowDebug(true);
+    }
+  }, [router.query.debug]);
   useEffect(() => {
     if (window !== undefined) {
       window.scrollTo(0, 0);
@@ -30,7 +38,7 @@ export default function Home() {
   return (
     <>
       <Metaheader />
-      <Layout showTopBar={showTopBar}>
+      <Layout showTopBar={showTopBar} theme="dark">
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
             <div
@@ -183,7 +191,7 @@ export default function Home() {
           </section>
         </div>
       </Layout>
-      <Model3d debug={false} show={show3dModel} />
+      <Model3d debug={showDebug} show={show3dModel} />
       <div className={`${styles.mainBg}`}>
         <div className={`${styles.ellipse}`}></div>
       </div>

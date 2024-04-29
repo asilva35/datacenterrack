@@ -189,27 +189,57 @@ class Model3dScene {
     this.bgMaterial = new THREE.RawShaderMaterial({
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
-      wireframe: false,
       //blending: THREE.AdditiveBlending,
       transparent: true,
       side: THREE.DoubleSide,
+      wireframe: this.config.scene.bgMaterial.wireframe,
       uniforms: {
         uTime: { value: 0 },
         ratio: { value: this.width / this.height },
-        uColor: { value: new THREE.Color('red') },
+        uColor: {
+          value: this.color(
+            this.config.scene.bgMaterial.uColor.r,
+            this.config.scene.bgMaterial.uColor.g,
+            this.config.scene.bgMaterial.uColor.b
+          ),
+        },
         uVertextCount: { value: total_vertices },
         uResolution: { value: new THREE.Vector2(this.width, this.height) },
-        uFrequency: { value: 0 },
-        uAmplitude: { value: 0.56 },
-        uDensity: { value: 0.56 },
-        uStrength: { value: 0.11 },
-        uDeepPurple: { value: 0.08 },
-        uOpacity: { value: 0.06 },
-        uBrightness: { value: this.color(0, 0, 0) },
-        uContrast: { value: this.color(227, 227, 227) },
-        uOscilation: { value: this.color(34, 122, 59) },
-        uPhase: { value: this.color(19, 120, 51) },
-        uSpeed: { value: 1.0 },
+        uFrequency: { value: this.config.scene.bgMaterial.uFrequency },
+        uAmplitude: { value: this.config.scene.bgMaterial.uAmplitude },
+        uDensity: { value: this.config.scene.bgMaterial.uDensity },
+        uStrength: { value: this.config.scene.bgMaterial.uStrength },
+        uDeepPurple: { value: this.config.scene.bgMaterial.uDeepPurple },
+        uOpacity: { value: this.config.scene.bgMaterial.uOpacity },
+        uBrightness: {
+          value: this.color(
+            this.config.scene.bgMaterial.uBrightness.r,
+            this.config.scene.bgMaterial.uBrightness.g,
+            this.config.scene.bgMaterial.uBrightness.b
+          ),
+        },
+        uContrast: {
+          value: this.color(
+            this.config.scene.bgMaterial.uContrast.r,
+            this.config.scene.bgMaterial.uContrast.g,
+            this.config.scene.bgMaterial.uContrast.b
+          ),
+        },
+        uOscilation: {
+          value: this.color(
+            this.config.scene.bgMaterial.uOscilation.r,
+            this.config.scene.bgMaterial.uOscilation.g,
+            this.config.scene.bgMaterial.uOscilation.b
+          ),
+        },
+        uPhase: {
+          value: this.color(
+            this.config.scene.bgMaterial.uPhase.r,
+            this.config.scene.bgMaterial.uPhase.g,
+            this.config.scene.bgMaterial.uPhase.b
+          ),
+        },
+        uSpeed: { value: this.config.scene.bgMaterial.uSpeed },
       },
     });
 
@@ -223,7 +253,7 @@ class Model3dScene {
     gltfLoader.load(
       './assets/models/datacenter-rack-configurator.glb',
       (gltf) => {
-        let floor, server;
+        let floor;
         gltf.scene.traverse((child) => {
           if (child.name === 'floor') {
             floor = child;
@@ -249,7 +279,9 @@ class Model3dScene {
             this.server = child;
           }
         });
-        //this.scene.add(floor);
+        if (this.config.floor02 && this.config.floor02.active) {
+          this.scene.add(floor);
+        }
         this.scene.add(this.server);
         this.updateAllMaterials();
       },
@@ -259,78 +291,82 @@ class Model3dScene {
       }
     );
 
-    const geometry = new THREE.PlaneGeometry(
+    if (this.config.floor && this.config.floor.active) {
+      const geometry = new THREE.PlaneGeometry(
+        this.config.floor.width,
+        this.config.floor.height
+      );
+      const material = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(this.config.floor.color),
+        roughness: this.config.floor.roughness,
+        clearcoat: this.config.floor.clearcoat,
+        metalness: this.config.floor.metalness,
+        clearcoatRoughness: this.config.floor.clearcoatRoughness,
+      });
+      this.floor = new THREE.Mesh(geometry, material);
+      this.floor.rotation.x = -Math.PI / 2;
+      this.scene.add(this.floor);
+      this.floor.visible = true;
+    }
+
+    const geometrySh = new THREE.PlaneGeometry(
       this.config.floor.width,
       this.config.floor.height
     );
-    const material = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(this.config.floor.color),
-      roughness: this.config.floor.roughness,
-      clearcoat: this.config.floor.clearcoat,
-      metalness: this.config.floor.metalness,
-      clearcoatRoughness: this.config.floor.clearcoatRoughness,
-    });
-    this.floor = new THREE.Mesh(geometry, material);
-    this.floor.rotation.x = -Math.PI / 2;
-    this.scene.add(this.floor);
-    this.floor.visible = true;
+    geometrySh.rotateX(-Math.PI / 2);
+
+    const materialSh = new THREE.ShadowMaterial();
+    materialSh.opacity = 0.2;
+
+    const plane = new THREE.Mesh(geometrySh, materialSh);
+    //plane.position.y = -200;
+    plane.receiveShadow = true;
+    this.scene.add(plane);
 
     this.addLights();
 
-    if (this.config.scene.showEnvironmentMap) this.addCubeTexture(10);
+    if (this.config.scene.showEnvironmentMap) this.addCubeTexture(14);
   }
 
   addLights() {
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 2.8);
-    this.scene.add(this.ambientLight);
+    if (this.config.lights && this.config.lights.length > 0) {
+      this.config.lights.forEach((l) => {
+        if (l.type === 'AmbientLight' && l.active) {
+          const light = new THREE.AmbientLight(
+            this.color(l.color.r, l.color.g, l.color.b),
+            l.intensity
+          );
+          light.visible = l.visible;
+          light.name = l.name;
+          light.label = l.label;
+          this.scene.add(light);
+        }
+        if (l.type === 'DirectionalLight' && l.active) {
+          const light = new THREE.DirectionalLight(
+            this.color(l.color.r, l.color.g, l.color.b),
+            l.intensity
+          );
+          light.visible = l.visible;
+          light.name = l.name;
+          light.label = l.label;
+          light.position.set(l.position.x, l.position.y, l.position.z);
+          light.scale.set(l.scale.x, l.scale.y, l.scale.z);
+          light.rotation.set(l.rotation.x, l.rotation.y, l.rotation.z);
+          light.castShadow = l.castShadow;
+          light.shadow.camera.far = l.shadow.camera.far;
+          light.shadow.mapSize.set(l.shadow.mapSize.x, l.shadow.mapSize.y);
+          light.shadow.normalBias = l.shadow.normalBias;
+          this.scene.add(light);
 
-    this.lights = [];
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.7);
-    directionalLight.position.set(7.2, 9.5, 5);
-    directionalLight.scale.set(1, 1, 1);
-    directionalLight.rotation.set(0.2, 1, -1);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.camera.far = 300;
-    directionalLight.shadow.mapSize.set(1024, 1024);
-    directionalLight.shadow.normalBias = 0.05; //CURVE SURFACES
-    //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
-    this.scene.add(directionalLight);
-
-    const directionalLightHelper = new THREE.DirectionalLightHelper(
-      directionalLight,
-      2
-    );
-    this.scene.add(directionalLightHelper);
-    directionalLightHelper.visible = false;
-
-    this.lights.push({
-      light: directionalLight,
-      helper: directionalLightHelper,
-    });
-
-    const directionalLight02 = new THREE.DirectionalLight(0xffffff, 0);
-    directionalLight02.position.set(8.4, 9.5, 45.4);
-    directionalLight02.scale.set(1, 1, 1);
-    directionalLight02.rotation.set(-0.2, -0.7, 0.2);
-    directionalLight02.castShadow = true;
-    directionalLight02.shadow.camera.far = 300;
-    directionalLight02.shadow.mapSize.set(1024, 1024);
-    directionalLight02.shadow.normalBias = 0.05; //CURVE SURFACES
-    //directionalLight.shadow.bias = 0.05; //FLAT SURFACES
-    this.scene.add(directionalLight02);
-
-    const directionalLightHelper02 = new THREE.DirectionalLightHelper(
-      directionalLight02,
-      2
-    );
-    this.scene.add(directionalLightHelper02);
-    directionalLightHelper02.visible = false;
-
-    this.lights.push({
-      light: directionalLight02,
-      helper: directionalLightHelper02,
-    });
+          if (this.debug) {
+            const lightHelper = new THREE.DirectionalLightHelper(light, 2);
+            lightHelper.name = l.name + 'Helper';
+            this.scene.add(lightHelper);
+            lightHelper.visible = l.helper;
+          }
+        }
+      });
+    }
   }
 
   updateAllMaterials() {
@@ -357,8 +393,6 @@ class Model3dScene {
     new Debug({
       debugObject: this.config,
       camera: this.camera,
-      ambientLight: this.ambientLight,
-      lights: this.lights,
       bloomPass: this.bloomPass,
       renderer: this.renderer,
       scene: this.scene,

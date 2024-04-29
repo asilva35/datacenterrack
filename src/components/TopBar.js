@@ -12,7 +12,7 @@ import {
 } from '@nextui-org/react';
 
 export default function TopBar(props) {
-  const { showTopBar } = props;
+  const { showTopBar, theme } = props;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
@@ -24,7 +24,11 @@ export default function TopBar(props) {
       <NavbarBrand>
         <Link href="/">
           <Image
-            src={`/assets/images/logo-white.svg`}
+            src={
+              theme === 'dark'
+                ? `/assets/images/logo-white.svg`
+                : `/assets/images/logo-dark.svg`
+            }
             width={129}
             height={40}
             alt="Logo"
@@ -37,7 +41,11 @@ export default function TopBar(props) {
         className="hide-md hide-lg hide-xl"
         icon={
           <Image
-            src={`/assets/images/hamburguer-menu.svg`}
+            src={
+              theme === 'dark'
+                ? `/assets/images/hamburguer-menu-light.svg`
+                : `/assets/images/hamburguer-menu-dark.svg`
+            }
             width={34}
             height={20}
             alt="Menu"
@@ -49,11 +57,11 @@ export default function TopBar(props) {
         justify="end"
         className="hide-xss hide-xs hide-sm"
       >
-        <MainNavigation direction="horizontal" />
+        <MainNavigation direction="horizontal" theme={theme} />
       </NavbarContent>
       <NavbarMenu className={`${styles.NavbarMenu}`}>
         <div className={`${styles.MainNavigationCNT}`}>
-          <MainNavigation direction="vertical" />
+          <MainNavigation direction="vertical" theme={theme} />
         </div>
       </NavbarMenu>
     </Navbar>

@@ -2,8 +2,8 @@
     "scene":{
         "antialias": true,
         "alpha": false,
-        "showEnvironmentMap": true,
-        "bgColor": "#070707",
+        "showEnvironmentMap": false,
+        "bgColor": "#8e8e8e",
         "bgMesh":{
             "rotation": false,
             "scale": {
@@ -11,6 +11,21 @@
                 "y": 0,
                 "z": 0
             }
+        },
+        "bgMaterial":{
+            "uFrequency":0,
+            "uAmplitude":0.56,
+            "uDensity":0.56,
+            "uStrength":0.11,
+            "uDeepPurple":0.08,
+            "uOpacity":0.06,
+            "uColor":{"r":255,"g":0,"b":0},
+            "uBrightness":{"r":150,"g":50,"b":10},
+            "uContrast":{"r":227,"g":227,"b":227},
+            "uOscilation":{"r":34,"g":122,"b":59},
+            "uPhase":{"r":19,"g":120,"b":51},
+            "uSpeed":1.0,
+            "wireframe":false
         }
     },
     "camera":{
@@ -36,11 +51,110 @@
     },
     "floor":{
         "color": "#29282d",
+        "active":false,
         "roughness": 0.72,
         "clearcoat": 1,
         "clearcoatRoughness": 0.19,
         "metalness": 1,
         "width": 500,
         "height": 500
-    }
+    },
+    "floor02":{
+        "active":false
+    },
+    "lights":[
+        {
+            "type":"AmbientLight",
+            "name":"AmbientLight",
+            "label":"Ambient Light",
+            "color":{
+                "r":255,
+                "g":255,
+                "b":255
+            },
+            "active":true,
+            "intensity":2.8,
+            "visible":true
+        },
+        {
+            "type":"DirectionalLight",
+            "name":"DirectionalLight",
+            "label":"Directional Light",
+            "color":{
+                "r":56,
+                "g":56,
+                "b":71
+            },
+            "active":true,
+            "helper":false,
+            "visible":true,
+            "intensity":12.3,
+            "castShadow":false,
+            "shadow":{
+                "camera":{
+                    "far":300
+                },
+                "mapSize":{
+                    "x":1024,
+                    "y":1024
+                },
+                "normalBias":0.05
+            },
+            "position":{
+                "x":7.2,
+                "y":9.5,
+                "z":5
+            },
+            "scale":{
+                "x":1,
+                "y":1,
+                "z":1
+            },
+            "rotation":{
+                "x":0.2,
+                "y":1,
+                "z":-1
+            }
+        },
+        {
+            "type":"DirectionalLight",
+            "name":"DirectionalLight02",
+            "label":"Directional Light 02",
+            "color":{
+                "r":56,
+                "g":56,
+                "b":71
+            },
+            "active":true,
+            "helper":false,
+            "visible":true,
+            "intensity":1,
+            "castShadow":true,
+            "shadow":{
+                "camera":{
+                    "far":300
+                },
+                "mapSize":{
+                    "x":1024,
+                    "y":1024
+                },
+                "normalBias":0.05
+            },
+            "position":{
+                "x":-73.1,
+                "y":-1.2,
+                "z":-100
+            },
+            "scale":{
+                "x":1,
+                "y":1,
+                "z":1
+            },
+            "rotation":{
+                "x":0.2,
+                "y":1,
+                "z":-1
+            }
+        }
+    ]
 }
