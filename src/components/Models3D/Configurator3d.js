@@ -5,11 +5,12 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+// import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+// import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+// import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 //import { UnrealBloomPass } from '@/lib/UnrealBloomPass';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+//import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+//import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -61,18 +62,19 @@ class Model3dScene {
     // Crea un renderizador
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.container,
-      antialias: this.config.scene.antialias,
+      //antialias: this.config.scene.antialias,
+      antialias: true,
       alpha: this.config.scene.alpha,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    //this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
     this.renderer.toneMapping = THREE.LinearToneMapping;
-    this.renderer.toneMappingExposure = 1;
+    this.renderer.toneMappingExposure = this.config.scene.toneMappingExposure;
     this.renderer.shadowMap.enabled = true;
-    // this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    //this.renderer.shadowMap.type = THREE.PCFShadowMap;
     this.renderer.shadowMap.type = THREE.VSMShadowMap;
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -97,37 +99,42 @@ class Model3dScene {
 
     this.addObjects();
 
-    //BLOOM EFFECT
-    const renderScene = new RenderPass(this.scene, this.camera);
-
-    this.bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      1.5,
-      0.4,
-      0.85
-    );
-    this.bloomPass.threshold = this.config.bloom.threshold;
-    this.bloomPass.strength = this.config.bloom.strength;
-    this.bloomPass.radius = this.config.bloom.radius;
-
-    const outputPass = new OutputPass();
-
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(renderScene);
-    this.composer.addPass(this.bloomPass);
-    this.composer.addPass(outputPass);
-
-    this.renderer.toneMappingExposure = Math.pow(
-      this.config.bloom.exposure,
-      4.0
-    );
-
-    if (this.debug) {
-      this.debugModel();
-    }
+    this.addPostProcessing();
 
     // Inicia la animación
     this.tick();
+  }
+
+  addPostProcessing() {
+    //BLOOM EFFECT
+    // const renderScene = new RenderPass(this.scene, this.camera);
+    // if (this.config.bloom && this.config.bloom.active) {
+    //   this.bloomPass = new UnrealBloomPass(
+    //     new THREE.Vector2(window.innerWidth, window.innerHeight),
+    //     1.5,
+    //     0.4,
+    //     0.85
+    //   );
+    //   this.bloomPass.threshold = this.config.bloom.threshold;
+    //   this.bloomPass.strength = this.config.bloom.strength;
+    //   this.bloomPass.radius = this.config.bloom.radius;
+    // }
+    // this.bokehPass = new BokehPass(this.scene, this.camera, {
+    //   focus: this.config.bokeh.focus,
+    //   aperture: this.config.bokeh.aperture,
+    //   maxblur: this.config.bokeh.maxblur,
+    // });
+    // const outputPass = new OutputPass();
+    // this.composer = new EffectComposer(this.renderer);
+    // this.composer.addPass(renderScene);
+    // if (this.config.bloom && this.config.bloom.active)
+    //   this.composer.addPass(this.bloomPass);
+    // //this.composer.addPass(this.bokehPass);
+    // this.composer.addPass(outputPass);
+    // this.renderer.toneMappingExposure = Math.pow(
+    //   this.config.bloom.exposure,
+    //   4.0
+    // );
   }
 
   show(styles) {
@@ -258,6 +265,15 @@ class Model3dScene {
           if (child.name === 'floor') {
             floor = child;
           }
+          if (child.name === 'server-rack-glass-window01') {
+            child.material.color = new THREE.Color(
+              this.config.server.glass.color.r,
+              this.config.server.glass.color.g,
+              this.config.server.glass.color.b
+            );
+            child.material.opacity = this.config.server.glass.opacity;
+            child.material.roughness = this.config.server.glass.roughness;
+          }
           if (child.name === 'server-rack-01') {
             child.traverse((serverRackChild) => {
               if (serverRackChild.name === 'logo-rack') {
@@ -267,11 +283,14 @@ class Model3dScene {
                     texture.wrapS = THREE.ClampToEdgeWrapping;
                     texture.wrapT = THREE.ClampToEdgeWrapping;
                     texture.flipY = false;
-                    serverRackChild.material = new THREE.MeshBasicMaterial({
+                    that.logoMaterial = new THREE.MeshStandardMaterial({
                       map: texture,
                       transparent: true,
                       opacity: 0.5,
+                      roughness: that.config.server.logo.roughness,
+                      metalness: that.config.server.logo.metalness,
                     });
+                    serverRackChild.material = that.logoMaterial;
                   }
                 );
               }
@@ -279,11 +298,14 @@ class Model3dScene {
             this.server = child;
           }
         });
-        if (this.config.floor02 && this.config.floor02.active) {
+        if (this.config.floor02 && this.config.floor02.active && floor) {
           this.scene.add(floor);
         }
         this.scene.add(this.server);
         this.updateAllMaterials();
+        if (this.debug) {
+          this.debugModel();
+        }
       },
       undefined,
       (error) => {
@@ -394,6 +416,7 @@ class Model3dScene {
       debugObject: this.config,
       camera: this.camera,
       bloomPass: this.bloomPass,
+      //bokehPass: this.bokehPass,
       renderer: this.renderer,
       scene: this.scene,
       controls: this.controls,
@@ -436,9 +459,9 @@ class Model3dScene {
 
     if (this.controls.enabled) this.controls.update();
 
-    this.composer.render();
+    //this.composer.render();
 
-    if (this.debug) {
+    if (this.debug && this.stats) {
       this.stats.update();
     }
   }

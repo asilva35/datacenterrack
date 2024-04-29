@@ -6,6 +6,7 @@ export class Debug {
     this.debugObject = options.debugObject;
     this.camera = options.camera;
     this.bloomPass = options.bloomPass;
+    this.bokehPass = options.bokehPass;
     this.renderer = options.renderer;
     this.scene = options.scene;
     this.controls = options.controls;
@@ -13,16 +14,17 @@ export class Debug {
     this.bgMesh = options.bgMesh;
     this.floor = options.floor;
     this.environmentMap = options.environmentMap;
-
     this.gui = new dat.GUI();
 
     this.addModalExport();
 
     this.debugBg();
+    this.debugServer();
     this.debugFloor();
     this.debugCamera();
     this.debugLights();
     this.debugBloom();
+    this.debugBokeh();
 
     this.getCurrentConfig();
   }
@@ -83,6 +85,13 @@ export class Debug {
         this.scene.background = new THREE.Color(value);
         this.debugObject.scene.bgColor = value;
       });
+
+    this.guiBgFolder
+      .add(this.debugObject.scene, 'toneMappingExposure', 0, 64, 0.1)
+      .onChange((value) => {
+        this.renderer.toneMappingExposure = value;
+      })
+      .name('Tone Mapping Exposure');
 
     this.guiBgFolder
       .add(this.debugObject.scene, 'showEnvironmentMap')
@@ -227,6 +236,76 @@ export class Debug {
       .name('Scale');
   }
 
+  debugServer() {
+    const folder = this.gui.addFolder('Server');
+
+    this.scene.traverse((child) => {
+      if (child.name === 'server-rack-glass-window01') {
+        const folderGlass = folder.addFolder('Glass');
+        folderGlass
+          .addColor(this.debugObject.server.glass, 'color')
+          .onChange((value) => {
+            child.material.color = new THREE.Color(value.r, value.g, value.b);
+          });
+
+        folderGlass
+          .add(this.debugObject.server.glass, 'opacity', 0, 1, 0.001)
+          .onChange((value) => {
+            child.material.opacity = value;
+          })
+          .name('Opacity');
+
+        folderGlass
+          .add(this.debugObject.server.glass, 'roughness', 0, 1, 0.001)
+          .onChange((value) => {
+            child.material.roughness = value;
+          })
+          .name('Roughness');
+      }
+      if (child.name === 'logo-rack') {
+        const folderLogo = folder.addFolder('Logo');
+        console.log(child.material);
+        folderLogo
+          .add(child.material, 'roughness', 0, 1, 0.001)
+          .onChange((value) => {
+            child.material.roughness = value;
+          })
+          .name('Roughness');
+        folderLogo
+          .add(child.material, 'metalness', 0, 1, 0.001)
+          .onChange((value) => {
+            child.material.metalness = value;
+          })
+          .name('Metalness');
+      }
+    });
+
+    // if (this.glassMaterial) {
+    //   const folderGlass = this.gui.addFolder('Glass');
+
+    //   folderGlass
+    //     .addColor(this.debugObject.server.glass, 'color')
+    //     .onChange((value) => {
+    //       this.glassMaterial.color = new THREE.Color(value.r, value.g, value.b);
+    //       //console.log(value);
+    //     });
+
+    //     folderGlass
+    //     .add(this.debugObject.server.glass, 'opacity', 0, 1, 0.001)
+    //     .onChange((value) => {
+    //       this.glassMaterial.opacity = value;
+    //     })
+    //     .name('Glass Opacity');
+
+    //     folderGlass
+    //     .add(this.debugObject.server.glass, 'roughness', 0, 1, 0.001)
+    //     .onChange((value) => {
+    //       this.glassMaterial.roughness = value;
+    //     })
+    //     .name('Glass Roughness');
+    // }
+  }
+
   debugFloor() {
     if (this.debugObject.floor && this.debugObject.floor.active) {
       this.guiBgFolder = this.gui.addFolder('Floor');
@@ -270,6 +349,30 @@ export class Debug {
     const that = this;
     /**Debug Camera */
     this.guiFolderCamera = this.gui.addFolder('Camera');
+    this.guiFolderCamera
+      .add(this.debugObject.camera, 'fov', 0, 800, 1)
+      .onChange((value) => {
+        this.camera.fov = value;
+        this.scene.updateMatrixWorld(true);
+      })
+      .name('FOV');
+
+    this.guiFolderCamera
+      .add(this.debugObject.camera, 'near', 0, 1000, 1)
+      .onChange((value) => {
+        this.camera.near = value;
+        this.scene.updateMatrixWorld(true);
+      })
+      .name('Near');
+
+    this.guiFolderCamera
+      .add(this.debugObject.camera, 'far', 0, 1000, 1)
+      .onChange((value) => {
+        this.camera.far = value;
+        this.scene.updateMatrixWorld(true);
+      })
+      .name('Far');
+
     this.guiFolderCamera
       .add(this.camera.position, 'x', -10, 10, 0.1)
       .name('Position X');
@@ -484,6 +587,7 @@ export class Debug {
   }
 
   debugBloom() {
+    if (!this.debugObject.bloom || !this.debugObject.bloom.active) return;
     const that = this;
     //DEBUG BLOOM
     const bloomFolder = this.gui.addFolder('Bloom');
@@ -513,6 +617,33 @@ export class Debug {
       .add(this.debugObject.bloom, 'exposure', 0.1, 2, 0.1)
       .onChange(function (value) {
         that.renderer.toneMappingExposure = Math.pow(value, 4.0);
+      });
+  }
+
+  debugBokeh() {
+    const that = this;
+
+    if (!this.debugObject.bokeh || !this.debugObject.bokeh.active) return;
+
+    //DEBUG BLOOM
+    const folder = this.gui.addFolder('Bokeh');
+
+    folder
+      .add(this.debugObject.bokeh, 'focus', 0.0, 300.0, 0.1)
+      .onChange(function (value) {
+        that.bokehPass.uniforms['focus'].value = Number(value);
+      });
+
+    folder
+      .add(that.debugObject.bokeh, 'aperture', 0.0, 0.001, 0.00001)
+      .onChange(function (value) {
+        that.bokehPass.uniforms['aperture'].value = Number(value);
+      });
+
+    folder
+      .add(that.debugObject.bokeh, 'maxblur', 0.0, 0.1, 0.001)
+      .onChange(function (value) {
+        that.bokehPass.uniforms['maxblur'].value = Number(value);
       });
   }
 

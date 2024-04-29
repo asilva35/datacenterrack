@@ -3,7 +3,8 @@
         "antialias": true,
         "alpha": false,
         "showEnvironmentMap": false,
-        "bgColor": "#8e8e8e",
+        "bgColor": "#ebe0ed",
+        "toneMappingExposure":5.2,
         "bgMesh":{
             "rotation": false,
             "scale": {
@@ -43,11 +44,33 @@
             "z":1.70057377010336
         }
     },
+    "server":{
+        "glass":{
+            "color":{
+                "r":71,
+                "g":82,
+                "b":130
+            },
+            "opacity":0.566,
+            "roughness":0.104
+        },
+        "logo":{
+            "roughness":1,
+            "metalness":1
+        }
+    },
     "bloom":{
+        "active":false,
         "threshold": 1,
         "strength": 0,
         "radius": 0,
         "exposure": 1.3
+    },
+    "bokeh":{
+        "active":false,
+        "focus":14.6,
+        "aperture":0.0001,
+        "maxblur":0.01
     },
     "floor":{
         "color": "#29282d",
@@ -135,14 +158,14 @@
                     "far":300
                 },
                 "mapSize":{
-                    "x":1024,
-                    "y":1024
+                    "x":2048,
+                    "y":2048
                 },
-                "normalBias":0.05
+                "normalBias":0.64
             },
             "position":{
                 "x":-73.1,
-                "y":-1.2,
+                "y":-21.4,
                 "z":-100
             },
             "scale":{
