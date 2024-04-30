@@ -4,4 +4,9 @@
     height: auto;
     min-height: 100vh;
     z-index: 4;
+    pointer-events: all;
+}
+
+.LayoutWrapper.pointerEventsNone{
+    pointer-events: none;
 }

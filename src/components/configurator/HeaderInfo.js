@@ -2,9 +2,10 @@ import React from 'react';
 import styles from '@/styles/HeaderInfo.module.css';
 import Image from '@/components/Image';
 
-export default function HeaderInfo() {
+export default function HeaderInfo(props) {
+  const { is360view } = props;
   return (
-    <div className={styles.HeaderInfo}>
+    <div className={`${styles.HeaderInfo} ${is360view ? styles.hide : ''}`}>
       <div className={styles.wrapper}>
         <div className={styles.title}>A 20</div>
         <div className={styles.subtitle}>349-40</div>

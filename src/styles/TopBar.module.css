@@ -4,19 +4,11 @@
     backdrop-filter: none;
     top:-64px;
     position: fixed;
+    transition: all 0.5s linear;
 }
 
 .Navbar.show{
-    animation: navBarAnim 0.5s linear 0.5s forwards;
-}
-
-@keyframes navBarAnim {
-    0%{
-        top: -64px;
-    }
-    100%{
-        top: 0;
-    }
+    top:0;
 }
 
 .logo{width:80px; height: auto;}

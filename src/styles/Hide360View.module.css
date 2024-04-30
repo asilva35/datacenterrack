@@ -1,0 +1,15 @@
+.Hide360View{
+    position: fixed;
+    top:-100px;
+    right: 40px;
+    transition:all 1s linear;
+    z-index: 5;
+}
+
+.Hide360View.show{
+    top:40px;
+}
+
+.Hide360View img{
+    cursor: pointer;
+}

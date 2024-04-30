@@ -12,16 +12,16 @@ import {
 } from '@nextui-org/react';
 
 export default function TopBar(props) {
-  const { showTopBar, theme, navStyle } = props;
+  const { showTopBar, theme, navStyle, is360view } = props;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
     <Navbar
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
-      className={`${styles.Navbar} ${showTopBar ? styles.show : ''} ${
-        styles[theme]
-      }`}
+      className={`${styles.Navbar} ${
+        showTopBar && !is360view ? styles.show : ''
+      } ${styles[theme]}`}
     >
       <NavbarBrand>
         <Link href="/">
