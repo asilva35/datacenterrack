@@ -39,7 +39,7 @@ export default function TopBar(props) {
         </Link>
       </NavbarBrand>
       <NavbarContent as="div" className={`${styles.LabelMenu}`}>
-        Menu
+        {navStyle === '02' && `Menu`}
         <NavbarMenuToggle
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
           className={navStyle === '01' ? `hide-md hide-lg hide-xl` : ''}

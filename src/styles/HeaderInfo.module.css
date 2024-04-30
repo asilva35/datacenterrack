@@ -21,7 +21,7 @@
 .title{
     font-family: var(--secondary-font);
     color:#BEB3C0;
-    font-size: 150px;
+    font-size: 180px;
     line-height: 150px;
 }
 
@@ -49,10 +49,26 @@
     font-size: 14px;
     line-height: 14px;
     cursor: pointer;
+    transition: all 0.2s linear;
+}
+
+.viewInfo:hover{
+    border: solid 1px goldenrod;
+    color: #795f1d;
 }
 
 .arrow{
     width: 61px;
     height: 16px;
     cursor: pointer;
+    position: relative;
+}
+
+.arrow img{
+    position:relative;
+    transition: all 0.2s linear;
+}
+
+.arrow:hover img{
+    transform: translate(5px,0);
 }

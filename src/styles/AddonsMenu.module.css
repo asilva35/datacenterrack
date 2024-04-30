@@ -1,0 +1,43 @@
+.AddonsMenu{
+    position: absolute;
+    top:50%;
+    right:200px;
+    transform: translate(0, -50%);
+}
+
+.wrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+}
+
+.title{
+    color: #918F92;
+}
+
+.AddonsMenu ul{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    gap:20px;
+    flex-wrap: wrap;
+    max-width: 202px;
+}
+
+.AddonsMenu ul li{
+    display: block;
+    filter:drop-shadow(4px 4px 4px rgba(0,0,0,0.25));
+    cursor: pointer;
+    transition: all 0.2s linear;
+}
+
+.AddonsMenu ul li:hover{
+    filter:drop-shadow(4px 4px 4px rgba(0,0,0,0.50));
+}
+
+.Icon360{
+    margin-top: 40px;
+    cursor: pointer;
+}

@@ -427,6 +427,15 @@ class Model3dScene {
     });
   }
 
+  enableControls(is360view) {
+    console.log('Enable Controls');
+    if (is360view) {
+      this.overlay.style.display = 'none';
+    } else {
+      this.overlay.style.display = 'block';
+    }
+  }
+
   addCubeTexture(n) {
     this.cubeTextLoader = new THREE.CubeTextureLoader();
     this.environmentMap = this.cubeTextLoader.load([
@@ -468,7 +477,7 @@ class Model3dScene {
 }
 
 export default function Configurator3d(props) {
-  const { debug, show, config } = props;
+  const { debug, show, config, is360view } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
@@ -496,6 +505,12 @@ export default function Configurator3d(props) {
       model3d.show(styles);
     }
   }, [show, model3d]);
+
+  useEffect(() => {
+    if (show && model3d) {
+      model3d.enableControls(is360view);
+    }
+  }, [is360view]);
 
   return (
     <>
