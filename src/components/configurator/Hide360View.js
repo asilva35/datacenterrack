@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from '@/styles/Hide360View.module.css';
 import Image from '@/components/Image';
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 export default function Hide360View(props) {
-  const { is360view } = props;
+  const { state, dispatch } = useContext(ConfiguratorContext);
   const onClickHide360 = () => {
-    if (props.onClickHide360) props.onClickHide360();
+    dispatch({
+      type: 'SET_360_VIEW',
+      is360view: false,
+    });
   };
   return (
-    <div className={`${styles.Hide360View} ${is360view ? styles.show : ''}`}>
+    <div
+      className={`${styles.Hide360View} ${state.is360view ? styles.show : ''}`}
+    >
       <div className={styles.wrapper} onClick={onClickHide360}>
         <Image
           src="/assets/images/close-360-icon.png"

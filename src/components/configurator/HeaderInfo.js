@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from '@/styles/HeaderInfo.module.css';
 import Image from '@/components/Image';
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 export default function HeaderInfo(props) {
-  const { is360view } = props;
+  const { state, dispatch } = useContext(ConfiguratorContext);
   return (
-    <div className={`${styles.HeaderInfo} ${is360view ? styles.hide : ''}`}>
+    <div
+      className={`${styles.HeaderInfo} ${state.is360view ? styles.hide : ''}`}
+    >
       <div className={styles.wrapper}>
         <div className={styles.title}>A 20</div>
         <div className={styles.subtitle}>349-40</div>

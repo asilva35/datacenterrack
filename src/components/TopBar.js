@@ -1,7 +1,8 @@
 import styles from '@/styles/TopBar.module.css';
 import Image from 'next/image';
-import React, { useEffect } from 'react';
+import React, { useContext } from 'react';
 import MainNavigation from '@/components/MainNavigation';
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 import {
   Link,
   Navbar,
@@ -12,15 +13,15 @@ import {
 } from '@nextui-org/react';
 
 export default function TopBar(props) {
-  const { showTopBar, theme, navStyle, is360view } = props;
+  const { showTopBar, theme, navStyle } = props;
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+  const { state, dispatch } = useContext(ConfiguratorContext);
   return (
     <Navbar
       maxWidth="full"
       onMenuOpenChange={setIsMenuOpen}
       className={`${styles.Navbar} ${
-        showTopBar && !is360view ? styles.show : ''
+        showTopBar && !state.is360view ? styles.show : ''
       } ${styles[theme]}`}
     >
       <NavbarBrand>

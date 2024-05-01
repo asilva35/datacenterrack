@@ -1,6 +1,7 @@
 import '@/styles/grid.css';
 import '@/styles/globals.css';
 
+import { ConfiguratorProvider } from '@/context/ConfiguratorContext';
 import { Josefin_Sans } from 'next/font/google';
 import { Jockey_One } from 'next/font/google';
 import { NextUIProvider } from '@nextui-org/react';
@@ -24,9 +25,11 @@ export default function App({ Component, pageProps }) {
           --secondary-font: ${secondary_font.style.fontFamily};
         }
       `}</style>
-      <NextUIProvider>
-        <Component {...pageProps} />
-      </NextUIProvider>
+      <ConfiguratorProvider>
+        <NextUIProvider>
+          <Component {...pageProps} />
+        </NextUIProvider>
+      </ConfiguratorProvider>
     </>
   );
 }

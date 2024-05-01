@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -19,6 +19,8 @@ import styles from '@/styles/Configurator3d.module.css';
 
 import fragmentShader from '@/shaders/fragment.glsl';
 import vertexShader from '@/shaders/vertex.glsl';
+
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 import Stats from 'three/examples/jsm/libs/stats.module';
 
@@ -477,11 +479,12 @@ class Model3dScene {
 }
 
 export default function Configurator3d(props) {
-  const { debug, show, config, is360view } = props;
+  const { debug, show, config } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
   const [model3d, setModel3D] = useState(null);
+  const { state, dispatch } = useContext(ConfiguratorContext);
 
   useEffect(() => {
     if (flag.current) return;
@@ -508,9 +511,9 @@ export default function Configurator3d(props) {
 
   useEffect(() => {
     if (show && model3d) {
-      model3d.enableControls(is360view);
+      model3d.enableControls(state.is360view);
     }
-  }, [is360view]);
+  }, [state.is360view]);
 
   return (
     <>

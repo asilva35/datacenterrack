@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from '@/styles/AddonsMenu.module.css';
 import Image from '@/components/Image';
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 export default function AddonsMenu(props) {
+  const { state, dispatch } = useContext(ConfiguratorContext);
+  const onClick360 = () => {
+    dispatch({
+      type: 'SET_360_VIEW',
+      is360view: true,
+    });
+  };
   return (
     <div className={styles.AddonsMenu}>
       <div className={styles.wrapper}>
@@ -23,12 +31,7 @@ export default function AddonsMenu(props) {
               ))}
           </ul>
         </div>
-        <div
-          className={styles.Icon360}
-          onClick={() => {
-            if (props.onClick360) props.onClick360();
-          }}
-        >
+        <div className={styles.Icon360} onClick={onClick360}>
           <Image
             src="/assets/images/360-icon.png"
             alt="360"
