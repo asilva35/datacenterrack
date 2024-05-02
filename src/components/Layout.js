@@ -4,15 +4,15 @@ import styles from '@/styles/Layout.module.css';
 import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 export default function Layout(props) {
-  const { children, showTopBar, theme, navStyle } = props;
+  const { children } = props;
   const { state, dispatch } = useContext(ConfiguratorContext);
   return (
     <div
-      className={`${styles.LayoutWrapper} ${
+      className={`${styles.LayoutWrapper} ${styles[state.theme]} ${
         state.is360view ? styles.pointerEventsNone : ''
       }`}
     >
-      <TopBar showTopBar={showTopBar} theme={theme} navStyle={navStyle} />
+      <TopBar />
       <div className={`${styles.LayoutBody}`}>{children}</div>
     </div>
   );

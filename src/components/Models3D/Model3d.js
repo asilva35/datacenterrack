@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -16,6 +16,8 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 import styles from '@/styles/Model3d.module.css';
 
@@ -329,7 +331,7 @@ class Model3dScene {
   show() {
     const camera_position = { ...this.camera.position };
     const control_target = { ...this.controls.target };
-    console.log(this.controls.target);
+
     this.controls.enabled = false;
     this.camera.position.set(
       -1.2615372011680765,
@@ -727,11 +729,12 @@ class Model3dScene {
 }
 
 export default function Model3d(props) {
-  const { debug, show } = props;
+  const { debug } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
   const [model3d, setModel3D] = useState(null);
+  const { state, dispatch } = useContext(ConfiguratorContext);
 
   useEffect(() => {
     if (flag.current) return;
@@ -742,7 +745,7 @@ export default function Model3d(props) {
       debug,
       styles,
     });
-    document.model3d = _model3d;
+    if (debug) document.model3d = _model3d;
     setModel3D(_model3d);
     // Limpia los recursos al desmontar el componente
     return () => {
@@ -751,10 +754,10 @@ export default function Model3d(props) {
   }, []);
 
   useEffect(() => {
-    if (show && model3d) {
+    if (state.show3DModel && model3d) {
       model3d.show();
     }
-  }, [show, model3d]);
+  }, [state.show3DModel, model3d]);
 
   return (
     <>

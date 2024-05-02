@@ -7,6 +7,14 @@
     pointer-events: all;
 }
 
+/* .LayoutWrapper.light{
+    background-color: #fff;
+}
+
+.LayoutWrapper.dark{
+    background-color: #000;
+} */
+
 .LayoutWrapper.pointerEventsNone{
     pointer-events: none;
 }

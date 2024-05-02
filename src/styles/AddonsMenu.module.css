@@ -3,6 +3,12 @@
     top:50%;
     right:200px;
     transform: translate(0, -50%);
+    opacity: 1;
+    transition: all 0.3s linear;
+}
+
+.AddonsMenu.hide{
+    opacity: 0;
 }
 
 .wrapper{

@@ -22,10 +22,8 @@ const Configurator3d = dynamic(
 );
 
 export default function Configurator() {
-  const [show3dModel, setShow3dModel] = useState(false);
-  const [showTopBar, setShowTopBar] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
   const [config, setConfig] = useState(configJson);
+  const [showDebug, setShowDebug] = useState(false);
   const { state, dispatch } = useContext(ConfiguratorContext);
 
   const router = useRouter();
@@ -37,12 +35,26 @@ export default function Configurator() {
   useEffect(() => {
     if (window !== undefined) {
       window.scrollTo(0, 0);
+      dispatch({
+        type: 'SET_THEME',
+        theme: 'light',
+      });
+      dispatch({
+        type: 'SET_NAV_STYLE',
+        navStyle: '02',
+      });
     }
   }, []);
   useEffect(() => {
     let timer = setTimeout(() => {
-      setShow3dModel(true);
-      setShowTopBar(true);
+      dispatch({
+        type: 'SHOW_3D_MODEL',
+        show3DModel: true,
+      });
+      dispatch({
+        type: 'SHOW_TOP_BAR',
+        showTopBar: true,
+      });
     }, 1000);
     return () => {
       clearTimeout(timer);
@@ -52,14 +64,14 @@ export default function Configurator() {
     <>
       <Metaheader />
       <Hide360View />
-      <Layout showTopBar={showTopBar} theme="light" navStyle="02">
+      <Layout>
         <TextRotated />
         <HeaderInfo />
         <AddonsMenu />
         <Thumbnails />
         <FooterMenu />
       </Layout>
-      <Configurator3d debug={showDebug} show={show3dModel} config={config} />
+      <Configurator3d debug={showDebug} config={config} />
       <div className="empty"></div>
     </>
   );

@@ -4,6 +4,11 @@
     right: 0;
     min-width: 50px;
     transform: translate(0,-50%);
+    transition: all 0.3s linear;
+}
+
+.Thumbnails.hide{
+    transform: translate(200px, -50%);
 }
 
 .wrapper{

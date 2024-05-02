@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styles from '@/styles/Thumbnails.module.css';
 import Image from '@/components/Image';
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
 
 export default function Thumbnails() {
+  const { state, dispatch } = useContext(ConfiguratorContext);
   return (
-    <div className={`${styles.Thumbnails}`}>
+    <div
+      className={`${styles.Thumbnails} ${state.is360view ? styles.hide : ''}`}
+    >
       <div className={`${styles.wrapper}`}>
         <ul>
           <li>

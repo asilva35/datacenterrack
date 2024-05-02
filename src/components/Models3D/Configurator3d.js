@@ -163,7 +163,10 @@ class Model3dScene {
       y: camera_position.y,
       z: camera_position.z,
       duration: 1,
-      onStart: () => {},
+      onStart: () => {
+        if (this.server) this.server.visible = true;
+        if (this.ground) this.ground.visible = true;
+      },
     });
     gsap.to(this.controls.target, {
       x: control_target.x,
@@ -262,11 +265,7 @@ class Model3dScene {
     gltfLoader.load(
       './assets/models/datacenter-rack-configurator.glb',
       (gltf) => {
-        let floor;
         gltf.scene.traverse((child) => {
-          if (child.name === 'floor') {
-            floor = child;
-          }
           if (child.name === 'server-rack-glass-window01') {
             child.material.color = new THREE.Color(
               this.config.server.glass.color.r,
@@ -300,10 +299,9 @@ class Model3dScene {
             this.server = child;
           }
         });
-        if (this.config.floor02 && this.config.floor02.active && floor) {
-          this.scene.add(floor);
-        }
+
         this.scene.add(this.server);
+        this.server.visible = false;
         this.updateAllMaterials();
         if (this.debug) {
           this.debugModel();
@@ -333,19 +331,19 @@ class Model3dScene {
       this.floor.visible = true;
     }
 
-    const geometrySh = new THREE.PlaneGeometry(
+    const geometryGround = new THREE.PlaneGeometry(
       this.config.floor.width,
       this.config.floor.height
     );
-    geometrySh.rotateX(-Math.PI / 2);
+    geometryGround.rotateX(-Math.PI / 2);
 
-    const materialSh = new THREE.ShadowMaterial();
-    materialSh.opacity = 0.2;
+    const materialGround = new THREE.ShadowMaterial();
+    materialGround.opacity = 0.05;
 
-    const plane = new THREE.Mesh(geometrySh, materialSh);
-    //plane.position.y = -200;
-    plane.receiveShadow = true;
-    this.scene.add(plane);
+    this.ground = new THREE.Mesh(geometryGround, materialGround);
+    this.ground.receiveShadow = true;
+    this.scene.add(this.ground);
+    this.ground.visible = false;
 
     this.addLights();
 
@@ -430,11 +428,30 @@ class Model3dScene {
   }
 
   enableControls(is360view) {
-    console.log('Enable Controls');
     if (is360view) {
+      this.previusCameraPosition = {
+        position: { ...this.camera.position },
+        target: { ...this.controls.target },
+      };
       this.overlay.style.display = 'none';
+      this.ground.visible = false;
     } else {
       this.overlay.style.display = 'block';
+      this.ground.visible = true;
+      if (this.previusCameraPosition) {
+        gsap.to(this.camera.position, {
+          x: this.previusCameraPosition.position.x,
+          y: this.previusCameraPosition.position.y,
+          z: this.previusCameraPosition.position.z,
+          duration: 1,
+        });
+        gsap.to(this.controls.target, {
+          x: this.previusCameraPosition.target.x,
+          y: this.previusCameraPosition.target.y,
+          z: this.previusCameraPosition.target.z,
+          duration: 1,
+        });
+      }
     }
   }
 
@@ -479,7 +496,7 @@ class Model3dScene {
 }
 
 export default function Configurator3d(props) {
-  const { debug, show, config } = props;
+  const { debug, config } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
@@ -497,20 +514,19 @@ export default function Configurator3d(props) {
     });
     if (debug) document.model3d = _model3d;
     setModel3D(_model3d);
-    // Limpia los recursos al desmontar el componente
     return () => {
       _model3d.renderer.dispose();
     };
   }, []);
 
   useEffect(() => {
-    if (show && model3d) {
+    if (state.show3DModel && model3d) {
       model3d.show(styles);
     }
-  }, [show, model3d]);
+  }, [state.show3DModel, model3d]);
 
   useEffect(() => {
-    if (show && model3d) {
+    if (state.show3DModel && model3d) {
       model3d.enableControls(state.is360view);
     }
   }, [state.is360view]);

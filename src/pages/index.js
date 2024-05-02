@@ -1,20 +1,21 @@
 import Layout from '@/components/Layout';
 import Metaheader from '@/components/Metaheader';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import dynamic from 'next/dynamic';
 import styles from '@/styles/Home.module.css';
 
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 
+import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+
 const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
   ssr: false,
 });
 
 export default function Home() {
-  const [show3dModel, setShow3dModel] = useState(false);
-  const [showTopBar, setShowTopBar] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
+  const { state, dispatch } = useContext(ConfiguratorContext);
   const router = useRouter();
   useEffect(() => {
     if (router.query.debug) {
@@ -24,12 +25,26 @@ export default function Home() {
   useEffect(() => {
     if (window !== undefined) {
       window.scrollTo(0, 0);
+      dispatch({
+        type: 'SET_THEME',
+        theme: 'dark',
+      });
+      dispatch({
+        type: 'SET_NAV_STYLE',
+        navStyle: '01',
+      });
     }
   }, []);
   useEffect(() => {
     let timer = setTimeout(() => {
-      setShow3dModel(true);
-      setShowTopBar(true);
+      dispatch({
+        type: 'SHOW_3D_MODEL',
+        show3DModel: true,
+      });
+      dispatch({
+        type: 'SHOW_TOP_BAR',
+        showTopBar: true,
+      });
     }, 7000);
     return () => {
       clearTimeout(timer);
@@ -38,7 +53,7 @@ export default function Home() {
   return (
     <>
       <Metaheader />
-      <Layout showTopBar={showTopBar} theme="dark" navStyle="01">
+      <Layout>
         <div className={`${styles.home} ${styles.intro}`}>
           <header>
             <div
@@ -191,7 +206,7 @@ export default function Home() {
           </section>
         </div>
       </Layout>
-      <Model3d debug={showDebug} show={show3dModel} />
+      <Model3d debug={showDebug} />
       <div className={`${styles.mainBg}`}>
         <div className={`${styles.ellipse}`}></div>
       </div>

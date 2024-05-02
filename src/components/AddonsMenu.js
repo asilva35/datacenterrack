@@ -12,7 +12,9 @@ export default function AddonsMenu(props) {
     });
   };
   return (
-    <div className={styles.AddonsMenu}>
+    <div
+      className={`${styles.AddonsMenu} ${state.is360view ? styles.hide : ''}`}
+    >
       <div className={styles.wrapper}>
         <div className={styles.title}>Addons</div>
         <div className={styles.menus}>
