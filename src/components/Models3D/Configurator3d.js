@@ -37,7 +37,8 @@ class Model3dScene {
 
     this.scene = new this.THREE.Scene();
 
-    this.scene.background = new THREE.Color(this.config.scene.bgColor);
+    if (this.config.scene.bgColor)
+      this.scene.background = new THREE.Color(this.config.scene.bgColor);
 
     // Crea una cámara
     this.camera = new THREE.PerspectiveCamera(
@@ -64,8 +65,7 @@ class Model3dScene {
     // Crea un renderizador
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.container,
-      //antialias: this.config.scene.antialias,
-      antialias: true,
+      antialias: this.config.scene.antialias,
       alpha: this.config.scene.alpha,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -266,6 +266,9 @@ class Model3dScene {
       './assets/models/datacenter-rack-configurator.glb',
       (gltf) => {
         gltf.scene.traverse((child) => {
+          if (child.name === 'white-bg') {
+            this.whiteBg = child;
+          }
           if (child.name === 'server-rack-glass-window01') {
             child.material.color = new THREE.Color(
               this.config.server.glass.color.r,
@@ -301,6 +304,7 @@ class Model3dScene {
         });
 
         this.scene.add(this.server);
+        this.scene.add(this.whiteBg);
         this.server.visible = false;
         this.updateAllMaterials();
         if (this.debug) {

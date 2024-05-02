@@ -11,6 +11,7 @@ import FooterMenu from '@/components/configurator/FooterMenu';
 import Thumbnails from '@/components/configurator/Thumbnails';
 import AddonsMenu from '@/components/AddonsMenu';
 import Hide360View from '@/components/configurator/Hide360View';
+import BG from '@/components/configurator/BG';
 
 import { AppContext } from '@/context/AppContext';
 
@@ -72,7 +73,7 @@ export default function Configurator() {
         <FooterMenu />
       </Layout>
       <Configurator3d debug={showDebug} config={config} />
-      <div className="empty"></div>
+      <BG />
     </>
   );
 }

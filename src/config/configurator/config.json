@@ -1,9 +1,9 @@
 {
     "scene":{
         "antialias": true,
-        "alpha": false,
+        "alpha": true,
         "showEnvironmentMap": false,
-        "bgColor": "#ebe0ed",
+        "bgColor": false,
         "toneMappingExposure":5.2,
         "bgMesh":{
             "rotation": false,
