@@ -1,10 +1,18 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '@/styles/AddonsMenu.module.css';
 import Image from '@/components/Image';
 import { AppContext } from '@/context/AppContext';
 
 export default function AddonsMenu(props) {
   const { state, dispatch } = useContext(AppContext);
+  const [hide, setHide] = useState(false);
+  useEffect(() => {
+    if (state.is360view || state.showProductInfo) {
+      setHide(true);
+    } else {
+      setHide(false);
+    }
+  }, [state.is360view, state.showProductInfo]);
   const onClick360 = () => {
     dispatch({
       type: 'SET_360_VIEW',
@@ -12,9 +20,7 @@ export default function AddonsMenu(props) {
     });
   };
   return (
-    <div
-      className={`${styles.AddonsMenu} ${state.is360view ? styles.hide : ''}`}
-    >
+    <div className={`${styles.AddonsMenu} ${hide ? styles.hide : ''}`}>
       <div className={styles.wrapper}>
         <div className={styles.title}>Addons</div>
         <div className={styles.menus}>

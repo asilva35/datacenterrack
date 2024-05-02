@@ -1,14 +1,20 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styles from '@/styles/Thumbnails.module.css';
 import Image from '@/components/Image';
 import { AppContext } from '@/context/AppContext';
 
 export default function Thumbnails() {
   const { state, dispatch } = useContext(AppContext);
+  const [hide, setHide] = useState(false);
+  useEffect(() => {
+    if (state.is360view || state.showProductInfo) {
+      setHide(true);
+    } else {
+      setHide(false);
+    }
+  }, [state.is360view, state.showProductInfo]);
   return (
-    <div
-      className={`${styles.Thumbnails} ${state.is360view ? styles.hide : ''}`}
-    >
+    <div className={`${styles.Thumbnails} ${hide ? styles.hide : ''}`}>
       <div className={`${styles.wrapper}`}>
         <ul>
           <li>

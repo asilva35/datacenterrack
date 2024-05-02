@@ -11,6 +11,7 @@ let initialState = {
   is360view: false,
   show3DModel: false,
   showDebug: false,
+  showProductInfo: false,
 };
 
 let reducer = (state, action) => {
@@ -43,6 +44,12 @@ let reducer = (state, action) => {
       return {
         ...state,
         show3DModel: action.show3DModel,
+      };
+    }
+    case 'SHOW_PRODUCT_INFO': {
+      return {
+        ...state,
+        showProductInfo: action.showProductInfo,
       };
     }
     case 'SHOW_DEBUG':

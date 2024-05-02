@@ -455,6 +455,42 @@ class Model3dScene {
     }
   }
 
+  showProductInfo(showProductInfo) {
+    if (showProductInfo) {
+      this.previusCameraPosition = {
+        position: { ...this.camera.position },
+        target: { ...this.controls.target },
+      };
+      gsap.to(this.camera.position, {
+        x: 7.659364955875672,
+        y: 2.7795928751740524,
+        z: 2.9445816060847427,
+        duration: 1,
+      });
+      gsap.to(this.controls.target, {
+        x: -1.745996244919798,
+        y: 2.299585416818556,
+        z: -4.370307678673102,
+        duration: 1,
+      });
+    } else {
+      if (this.previusCameraPosition) {
+        gsap.to(this.camera.position, {
+          x: this.previusCameraPosition.position.x,
+          y: this.previusCameraPosition.position.y,
+          z: this.previusCameraPosition.position.z,
+          duration: 1,
+        });
+        gsap.to(this.controls.target, {
+          x: this.previusCameraPosition.target.x,
+          y: this.previusCameraPosition.target.y,
+          z: this.previusCameraPosition.target.z,
+          duration: 1,
+        });
+      }
+    }
+  }
+
   addCubeTexture(n) {
     this.cubeTextLoader = new THREE.CubeTextureLoader();
     this.environmentMap = this.cubeTextLoader.load([
@@ -530,6 +566,12 @@ export default function Configurator3d(props) {
       model3d.enableControls(state.is360view);
     }
   }, [state.is360view]);
+
+  useEffect(() => {
+    if (state.showProductInfo && model3d) {
+      model3d.showProductInfo(state.showProductInfo);
+    }
+  }, [state.showProductInfo]);
 
   return (
     <>
