@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import styles from '@/styles/FooterMenu.module.css';
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 export default function FooterMenu() {
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
   return (
     <div
       className={`${styles.FooterMenu} ${state.is360view ? styles.hide : ''}`}

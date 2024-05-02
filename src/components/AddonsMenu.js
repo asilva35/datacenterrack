@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import styles from '@/styles/AddonsMenu.module.css';
 import Image from '@/components/Image';
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 export default function AddonsMenu(props) {
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
   const onClick360 = () => {
     dispatch({
       type: 'SET_360_VIEW',

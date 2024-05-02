@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import styles from '@/styles/HeaderInfo.module.css';
 import Image from '@/components/Image';
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 export default function HeaderInfo(props) {
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
   return (
     <div
       className={`${styles.HeaderInfo} ${state.is360view ? styles.hide : ''}`}

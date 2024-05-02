@@ -56,11 +56,11 @@ let reducer = (state, action) => {
   }
 };
 
-const ConfiguratorProvider = ({ children }) => {
+const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const value = { state, dispatch };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
-export { AppContext, ConfiguratorProvider, useAppContext };
+export { AppContext, AppProvider, useAppContext };

@@ -12,7 +12,7 @@ import Thumbnails from '@/components/configurator/Thumbnails';
 import AddonsMenu from '@/components/AddonsMenu';
 import Hide360View from '@/components/configurator/Hide360View';
 
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 const Configurator3d = dynamic(
   () => import('@/components/Models3D/Configurator3d'),
@@ -24,7 +24,7 @@ const Configurator3d = dynamic(
 export default function Configurator() {
   const [config, setConfig] = useState(configJson);
   const [showDebug, setShowDebug] = useState(false);
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
 
   const router = useRouter();
   useEffect(() => {

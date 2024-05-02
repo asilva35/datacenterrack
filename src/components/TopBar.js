@@ -2,7 +2,7 @@ import styles from '@/styles/TopBar.module.css';
 import Image from 'next/image';
 import React, { useContext, useEffect } from 'react';
 import MainNavigation from '@/components/MainNavigation';
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 import {
   Link,
   Navbar,
@@ -14,7 +14,7 @@ import {
 
 export default function TopBar(props) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
 
   return (
     <Navbar

@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import styles from '@/styles/Hide360View.module.css';
 import Image from '@/components/Image';
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 export default function Hide360View(props) {
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
   const onClickHide360 = () => {
     dispatch({
       type: 'SET_360_VIEW',

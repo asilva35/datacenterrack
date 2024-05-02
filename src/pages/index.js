@@ -7,7 +7,7 @@ import styles from '@/styles/Home.module.css';
 import { Button } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
   ssr: false,
@@ -15,7 +15,7 @@ const Model3d = dynamic(() => import('@/components/Models3D/Model3d'), {
 
 export default function Home() {
   const [showDebug, setShowDebug] = useState(false);
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
   const router = useRouter();
   useEffect(() => {
     if (router.query.debug) {

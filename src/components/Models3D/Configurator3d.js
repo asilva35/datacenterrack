@@ -20,7 +20,7 @@ import styles from '@/styles/Configurator3d.module.css';
 import fragmentShader from '@/shaders/fragment.glsl';
 import vertexShader from '@/shaders/vertex.glsl';
 
-import { ConfiguratorContext } from '@/context/ConfiguratorContext';
+import { AppContext } from '@/context/AppContext';
 
 import Stats from 'three/examples/jsm/libs/stats.module';
 
@@ -501,7 +501,7 @@ export default function Configurator3d(props) {
   const model3dOverlay = useRef();
   const flag = useRef();
   const [model3d, setModel3D] = useState(null);
-  const { state, dispatch } = useContext(ConfiguratorContext);
+  const { state, dispatch } = useContext(AppContext);
 
   useEffect(() => {
     if (flag.current) return;
