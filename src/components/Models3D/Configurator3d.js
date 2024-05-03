@@ -34,6 +34,7 @@ class Model3dScene {
     this.overlay = options.overlay;
     this.debug = options.debug;
     this.config = options.config;
+    this.onload = options.onload;
 
     this.scene = new this.THREE.Scene();
 
@@ -185,7 +186,31 @@ class Model3dScene {
     this.dracoLoader = new DRACOLoader();
     this.dracoLoader.setDecoderPath('./assets/draco/');
 
-    const gltfLoader = new GLTFLoader();
+    const manager = new THREE.LoadingManager();
+
+    manager.onLoad = function () {
+      if (that.onload) {
+        that.onload();
+      }
+    };
+
+    // manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+    //   console.log(
+    //     'Loading file: ' +
+    //       url +
+    //       '.\nLoaded ' +
+    //       itemsLoaded +
+    //       ' of ' +
+    //       itemsTotal +
+    //       ' files.'
+    //   );
+    // };
+
+    // manager.onError = function (url) {
+    //   console.log('There was an error loading ' + url);
+    // };
+
+    const gltfLoader = new GLTFLoader(manager);
     gltfLoader.setDRACOLoader(this.dracoLoader);
 
     const bgGeometry = new THREE.IcosahedronGeometry(2, 64);
@@ -266,9 +291,6 @@ class Model3dScene {
       './assets/models/datacenter-rack-configurator.glb',
       (gltf) => {
         gltf.scene.traverse((child) => {
-          if (child.name === 'white-bg') {
-            this.whiteBg = child;
-          }
           if (child.name === 'server-rack-glass-window01') {
             child.material.color = new THREE.Color(
               this.config.server.glass.color.r,
@@ -304,7 +326,6 @@ class Model3dScene {
         });
 
         this.scene.add(this.server);
-        this.scene.add(this.whiteBg);
         this.server.visible = false;
         this.updateAllMaterials();
         if (this.debug) {
@@ -543,6 +564,13 @@ export default function Configurator3d(props) {
   const [model3d, setModel3D] = useState(null);
   const { state, dispatch } = useContext(AppContext);
 
+  const onLoadModels = () => {
+    dispatch({
+      type: 'SHOW_3D_MODEL',
+      show3DModel: true,
+    });
+  };
+
   useEffect(() => {
     if (flag.current) return;
     flag.current = true;
@@ -551,6 +579,7 @@ export default function Configurator3d(props) {
       overlay: model3dOverlay.current,
       debug,
       config,
+      onload: onLoadModels,
     });
     if (debug) document.model3d = _model3d;
     setModel3D(_model3d);
@@ -572,7 +601,7 @@ export default function Configurator3d(props) {
   }, [state.is360view]);
 
   useEffect(() => {
-    if (state.showProductInfo && model3d) {
+    if (state.show3DModel && model3d) {
       model3d.showProductInfo(state.showProductInfo);
     }
   }, [state.showProductInfo]);

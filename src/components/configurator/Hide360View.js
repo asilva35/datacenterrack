@@ -17,7 +17,7 @@ export default function Hide360View(props) {
     >
       <div className={styles.wrapper} onClick={onClickHide360}>
         <Image
-          src="/assets/images/close-360-icon.png"
+          src="/assets/images/close-icon.png"
           width={46}
           height={46}
           alt="Close"

@@ -14,6 +14,7 @@ import Hide360View from '@/components/configurator/Hide360View';
 import BG from '@/components/configurator/BG';
 
 import { AppContext } from '@/context/AppContext';
+import ProductInfo from '@/components/configurator/ProductInfo';
 
 const Configurator3d = dynamic(
   () => import('@/components/Models3D/Configurator3d'),
@@ -47,20 +48,13 @@ export default function Configurator() {
     }
   }, []);
   useEffect(() => {
-    let timer = setTimeout(() => {
-      dispatch({
-        type: 'SHOW_3D_MODEL',
-        show3DModel: true,
-      });
+    if (state.show3DModel) {
       dispatch({
         type: 'SHOW_TOP_BAR',
         showTopBar: true,
       });
-    }, 1000);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
+    }
+  }, [state.show3DModel]);
   return (
     <>
       <Metaheader />
@@ -70,6 +64,7 @@ export default function Configurator() {
         <HeaderInfo />
         <AddonsMenu />
         <Thumbnails />
+        <ProductInfo />
         <FooterMenu />
       </Layout>
       <Configurator3d debug={showDebug} config={config} />
