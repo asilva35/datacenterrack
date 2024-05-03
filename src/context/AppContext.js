@@ -12,6 +12,10 @@ let initialState = {
   show3DModel: false,
   showDebug: false,
   showProductInfo: false,
+  loading: {
+    progress: 0,
+    text: 'Loading Progress: 0%',
+  },
 };
 
 let reducer = (state, action) => {
@@ -52,11 +56,20 @@ let reducer = (state, action) => {
         showProductInfo: action.showProductInfo,
       };
     }
-    case 'SHOW_DEBUG':
+    case 'SHOW_DEBUG': {
+      return {
+        ...state,
+        showDebug: action.showDebug,
+      };
+    }
+    case 'SET_LOADING':
       {
         return {
           ...state,
-          showDebug: action.showDebug,
+          loading: {
+            progress: action.loading.progress,
+            text: action.loading.text,
+          },
         };
       }
       throw Error('Unknown action: ' + action.type);

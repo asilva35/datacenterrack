@@ -35,6 +35,7 @@ class Model3dScene {
     this.debug = options.debug;
     this.config = options.config;
     this.onload = options.onload;
+    this.onLoadingProgress = options.onLoadingProgress;
 
     this.scene = new this.THREE.Scene();
 
@@ -194,21 +195,14 @@ class Model3dScene {
       }
     };
 
-    // manager.onProgress = function (url, itemsLoaded, itemsTotal) {
-    //   console.log(
-    //     'Loading file: ' +
-    //       url +
-    //       '.\nLoaded ' +
-    //       itemsLoaded +
-    //       ' of ' +
-    //       itemsTotal +
-    //       ' files.'
-    //   );
-    // };
+    manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+      const progress = (itemsLoaded * 100) / itemsTotal;
+      that.onLoadingProgress(progress, `Loading Progress: ${progress}%`);
+    };
 
-    // manager.onError = function (url) {
-    //   console.log('There was an error loading ' + url);
-    // };
+    manager.onError = function (url) {
+      console.log('There was an error loading ' + url);
+    };
 
     const gltfLoader = new GLTFLoader(manager);
     gltfLoader.setDRACOLoader(this.dracoLoader);
@@ -571,6 +565,16 @@ export default function Configurator3d(props) {
     });
   };
 
+  const onLoadingProgress = (progress, text) => {
+    dispatch({
+      type: 'SET_LOADING',
+      loading: {
+        progress,
+        text,
+      },
+    });
+  };
+
   useEffect(() => {
     if (flag.current) return;
     flag.current = true;
@@ -579,6 +583,7 @@ export default function Configurator3d(props) {
       overlay: model3dOverlay.current,
       debug,
       config,
+      onLoadingProgress: onLoadingProgress,
       onload: onLoadModels,
     });
     if (debug) document.model3d = _model3d;

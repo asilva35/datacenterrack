@@ -15,6 +15,7 @@ import BG from '@/components/configurator/BG';
 
 import { AppContext } from '@/context/AppContext';
 import ProductInfo from '@/components/configurator/ProductInfo';
+import LoadingScreen from '@/components/configurator/LoadingScreen';
 
 const Configurator3d = dynamic(
   () => import('@/components/Models3D/Configurator3d'),
@@ -58,6 +59,7 @@ export default function Configurator() {
   return (
     <>
       <Metaheader />
+      <LoadingScreen />
       <Hide360View />
       <Layout>
         <TextRotated />
