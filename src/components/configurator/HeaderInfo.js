@@ -5,14 +5,14 @@ import { AppContext } from '@/context/AppContext';
 
 export default function HeaderInfo(props) {
   const { state, dispatch } = useContext(AppContext);
-  const [hide, setHide] = useState(false);
+  const [hide, setHide] = useState(true);
   useEffect(() => {
-    if (state.is360view || state.showProductInfo) {
+    if (!state.show3DModel || state.is360view || state.showProductInfo) {
       setHide(true);
     } else {
       setHide(false);
     }
-  }, [state.is360view, state.showProductInfo]);
+  }, [state.show3DModel, state.is360view, state.showProductInfo]);
   const onClickViewInfo = () => {
     dispatch({
       type: 'SHOW_PRODUCT_INFO',

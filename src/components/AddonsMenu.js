@@ -5,14 +5,14 @@ import { AppContext } from '@/context/AppContext';
 
 export default function AddonsMenu(props) {
   const { state, dispatch } = useContext(AppContext);
-  const [hide, setHide] = useState(false);
+  const [hide, setHide] = useState(true);
   useEffect(() => {
-    if (state.is360view || state.showProductInfo) {
+    if (!state.show3DModel || state.is360view || state.showProductInfo) {
       setHide(true);
     } else {
       setHide(false);
     }
-  }, [state.is360view, state.showProductInfo]);
+  }, [state.show3DModel, state.is360view, state.showProductInfo]);
   const onClick360 = () => {
     dispatch({
       type: 'SET_360_VIEW',

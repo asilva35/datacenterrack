@@ -4,14 +4,14 @@ import { AppContext } from '@/context/AppContext';
 
 export default function FooterMenu() {
   const { state, dispatch } = useContext(AppContext);
-  const [hide, setHide] = useState(false);
+  const [hide, setHide] = useState(true);
   useEffect(() => {
-    if (state.is360view || state.showProductInfo) {
+    if (!state.show3DModel || state.is360view || state.showProductInfo) {
       setHide(true);
     } else {
       setHide(false);
     }
-  }, [state.is360view, state.showProductInfo]);
+  }, [state.show3DModel, state.is360view, state.showProductInfo]);
   return (
     <div className={`${styles.FooterMenu} ${hide ? styles.hide : ''}`}>
       <div className={styles.wrapper}>
