@@ -16,6 +16,7 @@ import BG from '@/components/configurator/BG';
 import { AppContext } from '@/context/AppContext';
 import ProductInfo from '@/components/configurator/ProductInfo';
 import LoadingScreen from '@/components/configurator/LoadingScreen';
+import InfoPoints from '@/components/configurator/InfoPoints';
 
 const Configurator3d = dynamic(
   () => import('@/components/Models3D/Configurator3d'),
@@ -67,6 +68,7 @@ export default function Configurator() {
         <AddonsMenu />
         <Thumbnails />
         <ProductInfo />
+        <InfoPoints config={config} />
         <FooterMenu />
       </Layout>
       <Configurator3d debug={showDebug} config={config} />

@@ -3,13 +3,31 @@
     top: 100px;
     right: 100px;
     opacity: 0;
-    transform: translate(-50%,0%);
+    transform: translate(0%,0%);
     transition: all 0.5s linear;
+    width: 50%;
+    height: 80%;
+    z-index: -1;
 }
 
 .ProductInfo.show{
     display: block;
     opacity: 1;
+    z-index: 5;
+}
+
+.wrapper{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.top{
+    width: 100%;
+    height: 16px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .close{
@@ -21,4 +39,57 @@
 .close img{
     width: 100%;
     height: auto;
+}
+
+.body{
+    width: 100%;
+    min-height: 100px;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.textCnt{
+    max-width: 300px;
+    margin-bottom: 40px;
+}
+
+.title{
+    font-size: 16px;
+    line-height: 100%;
+    margin-bottom: 10px;
+}
+
+.text{
+    font-size: 14px;
+    line-height: 100%;
+}
+
+.text ul{
+    list-style:disc; 
+    margin: 0;
+    padding: 0 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap:1px;
+}
+
+.text table{
+    width: 100%;
+    
+}
+
+.text table th, .text table td{
+    border:solid 1px #555;
+    padding: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    text-align: center;
+}
+
+.text table th{
+    font-weight: 600;
+    background-color: rgb(219, 240, 244);
 }

@@ -79,12 +79,14 @@ export class Debug {
 
   debugBg() {
     this.guiBgFolder = this.gui.addFolder('BG');
-    this.guiBgFolder
-      .addColor(this.debugObject.scene, 'bgColor')
-      .onChange((value) => {
-        this.scene.background = new THREE.Color(value);
-        this.debugObject.scene.bgColor = value;
-      });
+    if (this.debugObject.scene.bgColor) {
+      this.guiBgFolder
+        .addColor(this.debugObject.scene, 'bgColor')
+        .onChange((value) => {
+          this.scene.background = new THREE.Color(value);
+          this.debugObject.scene.bgColor = value;
+        });
+    }
 
     this.guiBgFolder
       .add(this.debugObject.scene, 'toneMappingExposure', 0, 64, 0.1)
@@ -239,6 +241,73 @@ export class Debug {
   debugServer() {
     const folder = this.gui.addFolder('Server');
 
+    const folderPoints = folder.addFolder('Points');
+    folderPoints
+      .add(
+        this.debugObject.products[0].infoPoints[0].position,
+        'x',
+        -10,
+        10,
+        0.001
+      )
+      .onChange((value) => {
+        const point = this.debugObject.products[0].infoPoints[0];
+        const pointElement = document.querySelector(`.${point.element}`);
+        const screenPosition = new THREE.Vector3(
+          value,
+          point.position.y,
+          point.position.z
+        );
+        screenPosition.project(this.camera);
+        const translateX = screenPosition.x * window.innerWidth * 0.5;
+        const translateY = -screenPosition.y * window.innerHeight * 0.5;
+        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+      });
+
+    folderPoints
+      .add(
+        this.debugObject.products[0].infoPoints[0].position,
+        'y',
+        -10,
+        10,
+        0.001
+      )
+      .onChange((value) => {
+        const point = this.debugObject.products[0].infoPoints[0];
+        const pointElement = document.querySelector(`.${point.element}`);
+        const screenPosition = new THREE.Vector3(
+          point.position.x,
+          value,
+          point.position.z
+        );
+        screenPosition.project(this.camera);
+        const translateX = screenPosition.x * window.innerWidth * 0.5;
+        const translateY = -screenPosition.y * window.innerHeight * 0.5;
+        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+      });
+
+    folderPoints
+      .add(
+        this.debugObject.products[0].infoPoints[0].position,
+        'z',
+        -10,
+        10,
+        0.001
+      )
+      .onChange((value) => {
+        const point = this.debugObject.products[0].infoPoints[0];
+        const pointElement = document.querySelector(`.${point.element}`);
+        const screenPosition = new THREE.Vector3(
+          point.position.x,
+          point.position.y,
+          value
+        );
+        screenPosition.project(this.camera);
+        const translateX = screenPosition.x * window.innerWidth * 0.5;
+        const translateY = -screenPosition.y * window.innerHeight * 0.5;
+        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+      });
+
     this.scene.traverse((child) => {
       if (child.name === 'server-rack-glass-window01') {
         const folderGlass = folder.addFolder('Glass');
@@ -279,31 +348,6 @@ export class Debug {
           .name('Metalness');
       }
     });
-
-    // if (this.glassMaterial) {
-    //   const folderGlass = this.gui.addFolder('Glass');
-
-    //   folderGlass
-    //     .addColor(this.debugObject.server.glass, 'color')
-    //     .onChange((value) => {
-    //       this.glassMaterial.color = new THREE.Color(value.r, value.g, value.b);
-    //       //console.log(value);
-    //     });
-
-    //     folderGlass
-    //     .add(this.debugObject.server.glass, 'opacity', 0, 1, 0.001)
-    //     .onChange((value) => {
-    //       this.glassMaterial.opacity = value;
-    //     })
-    //     .name('Glass Opacity');
-
-    //     folderGlass
-    //     .add(this.debugObject.server.glass, 'roughness', 0, 1, 0.001)
-    //     .onChange((value) => {
-    //       this.glassMaterial.roughness = value;
-    //     })
-    //     .name('Glass Roughness');
-    // }
   }
 
   debugFloor() {

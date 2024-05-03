@@ -1,0 +1,68 @@
+.InfoPoints{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+}
+
+.InfoPoints.show{
+    z-index: 4;
+    opacity: 1;
+}
+
+.wrapper{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.points{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.point{
+    position: absolute;
+    top:50%;
+    left: 25%;
+    width: 40px;
+    height: 40px;
+}
+
+.pointBorder{
+    position: absolute;
+    top:50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: solid 1px #5195FB;
+    transform: scale(1) translate(-50%,-50%);
+    animation: pointBorderAnim 1s linear infinite;
+}
+
+@keyframes pointBorderAnim {
+    0%{
+        width: 20px;
+        height: 20px;
+    }
+    100%{
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.pointBody{
+    position: absolute;
+    top:50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color:#5195FB;
+    transform: translate(-50%,-50%);
+}

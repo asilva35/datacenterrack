@@ -36,6 +36,8 @@ class Model3dScene {
     this.config = options.config;
     this.onload = options.onload;
     this.onLoadingProgress = options.onLoadingProgress;
+    this.raycaster = new THREE.Raycaster();
+    this.pointer = new THREE.Vector2();
 
     this.scene = new this.THREE.Scene();
 
@@ -105,8 +107,30 @@ class Model3dScene {
 
     this.addPostProcessing();
 
+    this.pointerMoveEvent();
+
     // Inicia la animación
     this.tick();
+  }
+
+  pointerMoveEvent() {
+    document.addEventListener('pointermove', this.onPointerMove.bind(this));
+    document.addEventListener('click', this.getPointerValue.bind(this));
+  }
+
+  onPointerMove(event) {
+    this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+  }
+
+  getPointerValue() {
+    if (!this.server) return;
+    const intersects = this.raycaster.intersectObjects(this.scene.children);
+    if (intersects.length > 0) {
+      console.log(this.pointer, intersects);
+    }
   }
 
   addPostProcessing() {
@@ -476,20 +500,21 @@ class Model3dScene {
 
   showProductInfo(showProductInfo) {
     if (showProductInfo) {
+      console.log(this.config.products[0].infoPoints[0]);
       this.previusCameraPosition = {
         position: { ...this.camera.position },
         target: { ...this.controls.target },
       };
       gsap.to(this.camera.position, {
-        x: 7.659364955875672,
-        y: 2.7795928751740524,
-        z: 2.9445816060847427,
+        x: 8.142370217469859,
+        y: 2.926579226214953,
+        z: 2.3138967812666484,
         duration: 1,
       });
       gsap.to(this.controls.target, {
-        x: -1.745996244919798,
-        y: 2.299585416818556,
-        z: -4.370307678673102,
+        x: -1.2629907825301445,
+        y: 2.446571226214952,
+        z: -5.000993218733351,
         duration: 1,
       });
     } else {
@@ -528,6 +553,8 @@ class Model3dScene {
   }
   // Función para actualizar la escena
   tick() {
+    if (this.controls.enabled) this.controls.update();
+
     requestAnimationFrame(this.tick.bind(this));
 
     const elapsedTime = this.clock.getElapsedTime();
@@ -537,10 +564,27 @@ class Model3dScene {
       this.bgMesh.rotation.z += 0.001;
     }
 
+    // if (this.server) {
+    //   const point = this.config.products[0].infoPoints[0];
+    //   const pointElement = document.querySelector(`.${point.element}`);
+    //   const screenPosition = new THREE.Vector3(
+    //     point.position.x,
+    //     point.position.y,
+    //     point.position.z
+    //   );
+    //   screenPosition.project(this.camera);
+
+    //   // this.raycaster.setFromCamera(screenPosition,this.camera);
+    //   // const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+    //   // console.log(intersects);
+
+    //   const translateX = screenPosition.x * window.innerWidth * 0.5;
+    //   const translateY = -screenPosition.y * window.innerHeight * 0.5;
+    //   pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+    // }
+
     // Renderiza la escena con la cámara
     this.renderer.render(this.scene, this.camera);
-
-    if (this.controls.enabled) this.controls.update();
 
     //this.composer.render();
 
