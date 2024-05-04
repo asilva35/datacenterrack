@@ -14,6 +14,7 @@ export class Debug {
     this.bgMesh = options.bgMesh;
     this.floor = options.floor;
     this.environmentMap = options.environmentMap;
+    this.cube = options.cube;
     this.gui = new dat.GUI();
 
     this.addModalExport();
@@ -262,6 +263,7 @@ export class Debug {
         const translateX = screenPosition.x * window.innerWidth * 0.5;
         const translateY = -screenPosition.y * window.innerHeight * 0.5;
         pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+        this.cube.position.x = value;
       });
 
     folderPoints
@@ -284,6 +286,7 @@ export class Debug {
         const translateX = screenPosition.x * window.innerWidth * 0.5;
         const translateY = -screenPosition.y * window.innerHeight * 0.5;
         pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+        this.cube.position.y = value;
       });
 
     folderPoints
@@ -306,6 +309,7 @@ export class Debug {
         const translateX = screenPosition.x * window.innerWidth * 0.5;
         const translateY = -screenPosition.y * window.innerHeight * 0.5;
         pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+        this.cube.position.z = value;
       });
 
     this.scene.traverse((child) => {

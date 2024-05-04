@@ -73,7 +73,7 @@ class Model3dScene {
       alpha: this.config.scene.alpha,
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    //this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.physicallyCorrectLights = true;
     this.renderer.outputEncoding = THREE.sRGBEncoding;
@@ -184,6 +184,8 @@ class Model3dScene {
     this.controls.update();
     this.controls.enabled = true;
     this.overlay.classList.add(styles.hide);
+    if (this.server) this.server.visible = true;
+    if (this.ground) this.ground.visible = true;
     gsap.to(this.camera.position, {
       x: camera_position.x,
       y: camera_position.y,
@@ -304,11 +306,14 @@ class Model3dScene {
     this.bgMesh.scale.x = this.config.scene.bgMesh.scale.x;
     this.bgMesh.scale.z = this.config.scene.bgMesh.scale.z;
     this.bgMesh.scale.y = this.config.scene.bgMesh.scale.y;
-
+    this.infoPoint01 = null;
     gltfLoader.load(
       './assets/models/datacenter-rack-configurator.glb',
       (gltf) => {
         gltf.scene.traverse((child) => {
+          if (child.name === 'info-point-01') {
+            this.infoPoint01 = child;
+          }
           if (child.name === 'server-rack-glass-window01') {
             child.material.color = new THREE.Color(
               this.config.server.glass.color.r,
@@ -344,7 +349,22 @@ class Model3dScene {
         });
 
         this.scene.add(this.server);
+        this.server.position.set(0, 0, 0);
+        this.scene.updateMatrixWorld(true);
         this.server.visible = false;
+
+        // if (this.infoPoint01) {
+        //   this.scene.add(this.infoPoint01);
+        //   console.log(this.infoPoint01);
+        //   var position = new THREE.Vector3();
+        //   console.log(this.infoPoint01.position);
+        //   //position.setFromMatrixPosition(this.infoPoint01);
+        //   // console.log(position.x + ',' + position.y + ',' + position.z);
+        // }
+
+        // const axesHelper = new THREE.AxesHelper(5);
+        // this.scene.add(axesHelper);
+
         this.updateAllMaterials();
         if (this.debug) {
           this.debugModel();
@@ -387,6 +407,18 @@ class Model3dScene {
     this.ground.receiveShadow = true;
     this.scene.add(this.ground);
     this.ground.visible = false;
+
+    this.cube = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, 0.2, 0.2),
+      new THREE.MeshBasicMaterial({ color: 0xff0000 })
+    );
+    const point = this.config.products[0].infoPoints[0];
+    this.scene.add(this.cube);
+    this.cube.position.set(
+      point.position.x,
+      point.position.y,
+      point.position.z
+    );
 
     this.addLights();
 
@@ -466,6 +498,7 @@ class Model3dScene {
       bgMaterial: this.bgMaterial,
       bgMesh: this.bgMesh,
       floor: this.floor,
+      cube: this.cube,
       environmentMap: this.environmentMap,
     });
   }
@@ -500,7 +533,6 @@ class Model3dScene {
 
   showProductInfo(showProductInfo) {
     if (showProductInfo) {
-      console.log(this.config.products[0].infoPoints[0]);
       this.previusCameraPosition = {
         position: { ...this.camera.position },
         target: { ...this.controls.target },
@@ -564,24 +596,32 @@ class Model3dScene {
       this.bgMesh.rotation.z += 0.001;
     }
 
-    // if (this.server) {
-    //   const point = this.config.products[0].infoPoints[0];
-    //   const pointElement = document.querySelector(`.${point.element}`);
-    //   const screenPosition = new THREE.Vector3(
-    //     point.position.x,
-    //     point.position.y,
-    //     point.position.z
-    //   );
-    //   screenPosition.project(this.camera);
+    if (this.server) {
+      var position = new THREE.Vector3();
+      position.setFromMatrixPosition(this.server.matrixWorld);
+      //console.log(position.x + ',' + position.y + ',' + position.z);
 
-    //   // this.raycaster.setFromCamera(screenPosition,this.camera);
-    //   // const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-    //   // console.log(intersects);
+      const point = this.config.products[0].infoPoints[0];
+      const pointElement = document.querySelector(`.${point.element}`);
+      const screenPosition = new THREE.Vector3(
+        point.position.x,
+        point.position.y,
+        point.position.z
+      );
+      screenPosition.project(this.camera);
+      //console.log(screenPosition);
 
-    //   const translateX = screenPosition.x * window.innerWidth * 0.5;
-    //   const translateY = -screenPosition.y * window.innerHeight * 0.5;
-    //   pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-    // }
+      // this.raycaster.setFromCamera(screenPosition,this.camera);
+      // const intersects = this.raycaster.intersectObjects(this.scene.children, true);
+      // console.log(intersects);
+
+      const translateX = screenPosition.x * window.innerWidth * 0.5;
+      const translateY = -screenPosition.y * window.innerHeight * 0.5;
+      //translateX(44.67913711975466px) translateY(-285.6363909561153px)
+      //transform: translateX(364.6791px) translateY(-305.636px);
+      //console.log(window.innerWidth, window.innerHeight);
+      pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+    }
 
     // Renderiza la escena con la cámara
     this.renderer.render(this.scene, this.camera);
