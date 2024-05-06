@@ -408,21 +408,32 @@ class Model3dScene {
     this.scene.add(this.ground);
     this.ground.visible = false;
 
-    this.cube = new THREE.Mesh(
-      new THREE.BoxGeometry(0.2, 0.2, 0.2),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    );
-    const point = this.config.products[0].infoPoints[0];
-    this.scene.add(this.cube);
-    this.cube.position.set(
-      point.position.x,
-      point.position.y,
-      point.position.z
-    );
-
     this.addLights();
 
     if (this.config.scene.showEnvironmentMap) this.addCubeTexture(14);
+
+    if (this.debug) this.addInfoPointsHelpers();
+  }
+
+  addInfoPointsHelpers() {
+    this.config.products.forEach((product) => {
+      if (product.infoPoints) {
+        product.infoPoints.forEach((point) => {
+          const helper = new THREE.LineSegments(
+            new THREE.EdgesGeometry(new THREE.BoxGeometry(0.2, 0.2, 0.2)),
+            new THREE.LineBasicMaterial({ color: 0xffff00 })
+          );
+          helper.position.set(
+            point.position.x,
+            point.position.y,
+            point.position.z
+          );
+          helper.name = `${point.element}-helper`;
+          this.scene.add(helper);
+          helper.visible = point.helper;
+        });
+      }
+    });
   }
 
   addLights() {
@@ -597,30 +608,60 @@ class Model3dScene {
     }
 
     if (this.server) {
-      var position = new THREE.Vector3();
-      position.setFromMatrixPosition(this.server.matrixWorld);
-      //console.log(position.x + ',' + position.y + ',' + position.z);
+      this.config.products.forEach((product) => {
+        if (product.infoPoints) {
+          product.infoPoints.forEach((point) => {
+            //const point = this.config.products[0].infoPoints[0];
+            const pointPosition = new THREE.Vector3(
+              point.position.x,
+              point.position.y,
+              point.position.z
+            );
+            const pointElement = document.querySelector(`.${point.element}`);
+            const screenPosition = pointPosition.clone();
+            screenPosition.project(this.camera);
 
-      const point = this.config.products[0].infoPoints[0];
-      const pointElement = document.querySelector(`.${point.element}`);
-      const screenPosition = new THREE.Vector3(
-        point.position.x,
-        point.position.y,
-        point.position.z
-      );
-      screenPosition.project(this.camera);
-      //console.log(screenPosition);
+            this.raycaster.setFromCamera(screenPosition, this.camera);
+            const intersects = this.raycaster.intersectObjects(
+              this.server.children,
+              true
+            );
+            // No intersect found
+            if (intersects.length === 0) {
+              // Show
+              pointElement.style.opacity = 1;
+            } else {
+              // Get the distance of the intersection and the distance of the point
 
-      // this.raycaster.setFromCamera(screenPosition,this.camera);
-      // const intersects = this.raycaster.intersectObjects(this.scene.children, true);
-      // console.log(intersects);
+              const intersectionDistance = intersects[0].distance;
+              const pointDistance = pointPosition.distanceTo(
+                this.camera.position
+              );
 
-      const translateX = screenPosition.x * window.innerWidth * 0.5;
-      const translateY = -screenPosition.y * window.innerHeight * 0.5;
-      //translateX(44.67913711975466px) translateY(-285.6363909561153px)
-      //transform: translateX(364.6791px) translateY(-305.636px);
-      //console.log(window.innerWidth, window.innerHeight);
-      pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+              // Intersection is close than the point
+              if (intersectionDistance < pointDistance) {
+                // Hide
+                pointElement.style.opacity = 0;
+              }
+              // Intersection is further than the point
+              else {
+                // Show
+                pointElement.style.opacity = 1;
+              }
+            }
+
+            let translateX = Math.round(
+              screenPosition.x * window.innerWidth * 0.5
+            );
+            let translateY = Math.round(
+              -screenPosition.y * window.innerHeight * 0.5
+            );
+            translateX -= pointElement.getBoundingClientRect().width * 0.5;
+            translateY -= pointElement.getBoundingClientRect().height * 0.5;
+            pointElement.style.transform = `translate(${translateX}px, ${translateY}px)`;
+          });
+        }
+      });
     }
 
     // Renderiza la escena con la cámara

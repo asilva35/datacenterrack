@@ -1,6 +1,27 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
+function onChangeInfoPoint(scene, camera, point, value, dimension) {
+  const pointElement = document.querySelector(`.${point.element}`);
+  const screenPosition = new THREE.Vector3(
+    point.position.x,
+    point.position.y,
+    point.position.z
+  );
+  screenPosition[dimension] = value;
+  screenPosition.project(camera);
+  let translateX = screenPosition.x * window.innerWidth * 0.5;
+  let translateY = -screenPosition.y * window.innerHeight * 0.5;
+  translateX -= pointElement.getBoundingClientRect().width * 0.5;
+  translateY -= pointElement.getBoundingClientRect().height * 0.5;
+  pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+  scene.traverse((child) => {
+    if (child.name === `${point.element}-helper`) {
+      child.position[dimension] = value;
+    }
+  });
+}
+
 export class Debug {
   constructor(options) {
     this.debugObject = options.debugObject;
@@ -21,6 +42,7 @@ export class Debug {
 
     this.debugBg();
     this.debugServer();
+    this.debugInfoPoints();
     this.debugFloor();
     this.debugCamera();
     this.debugLights();
@@ -242,76 +264,6 @@ export class Debug {
   debugServer() {
     const folder = this.gui.addFolder('Server');
 
-    const folderPoints = folder.addFolder('Points');
-    folderPoints
-      .add(
-        this.debugObject.products[0].infoPoints[0].position,
-        'x',
-        -10,
-        10,
-        0.001
-      )
-      .onChange((value) => {
-        const point = this.debugObject.products[0].infoPoints[0];
-        const pointElement = document.querySelector(`.${point.element}`);
-        const screenPosition = new THREE.Vector3(
-          value,
-          point.position.y,
-          point.position.z
-        );
-        screenPosition.project(this.camera);
-        const translateX = screenPosition.x * window.innerWidth * 0.5;
-        const translateY = -screenPosition.y * window.innerHeight * 0.5;
-        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-        this.cube.position.x = value;
-      });
-
-    folderPoints
-      .add(
-        this.debugObject.products[0].infoPoints[0].position,
-        'y',
-        -10,
-        10,
-        0.001
-      )
-      .onChange((value) => {
-        const point = this.debugObject.products[0].infoPoints[0];
-        const pointElement = document.querySelector(`.${point.element}`);
-        const screenPosition = new THREE.Vector3(
-          point.position.x,
-          value,
-          point.position.z
-        );
-        screenPosition.project(this.camera);
-        const translateX = screenPosition.x * window.innerWidth * 0.5;
-        const translateY = -screenPosition.y * window.innerHeight * 0.5;
-        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-        this.cube.position.y = value;
-      });
-
-    folderPoints
-      .add(
-        this.debugObject.products[0].infoPoints[0].position,
-        'z',
-        -10,
-        10,
-        0.001
-      )
-      .onChange((value) => {
-        const point = this.debugObject.products[0].infoPoints[0];
-        const pointElement = document.querySelector(`.${point.element}`);
-        const screenPosition = new THREE.Vector3(
-          point.position.x,
-          point.position.y,
-          value
-        );
-        screenPosition.project(this.camera);
-        const translateX = screenPosition.x * window.innerWidth * 0.5;
-        const translateY = -screenPosition.y * window.innerHeight * 0.5;
-        pointElement.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-        this.cube.position.z = value;
-      });
-
     this.scene.traverse((child) => {
       if (child.name === 'server-rack-glass-window01') {
         const folderGlass = folder.addFolder('Glass');
@@ -350,6 +302,48 @@ export class Debug {
             child.material.metalness = value;
           })
           .name('Metalness');
+      }
+    });
+  }
+
+  debugInfoPoints() {
+    const folderPoints = this.gui.addFolder('Info Points');
+    this.debugObject.products.forEach((product, i) => {
+      const num = i + 1;
+      const folder = folderPoints.addFolder('Product-' + num);
+      if (product.infoPoints) {
+        product.infoPoints.forEach((point, ii) => {
+          const num = ii + 1;
+          const folderPoint = folder.addFolder('Point-' + num);
+          //TOGGLE HELPER VISIBILITY
+          folderPoint.add(point, 'helper').onChange((value) => {
+            this.scene.traverse((child) => {
+              if (child.name === `${point.element}-helper`) {
+                child.visible = value;
+              }
+            });
+          });
+          //CHANGE POSITION
+          ['x', 'y', 'z'].forEach((dimension) => {
+            folderPoint
+              .add(
+                point.position,
+                dimension,
+                point.debug[dimension].min,
+                point.debug[dimension].max,
+                point.debug[dimension].step
+              )
+              .onChange((value) => {
+                onChangeInfoPoint(
+                  this.scene,
+                  this.camera,
+                  point,
+                  value,
+                  dimension
+                );
+              });
+          });
+        });
       }
     });
   }

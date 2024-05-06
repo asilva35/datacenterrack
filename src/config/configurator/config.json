@@ -185,12 +185,56 @@
             "id":"01",
             "infoPoints":[
                 {
+                    "helper":true,
                     "position":{
-                        "x":1.223,
+                        "x":1.109,
                         "y":5.039,
                         "z":-0.572
                     },
-                    "element":"info-point-01-01"
+                    "element":"info-point-01-01",
+                    "debug":{
+                        "x":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "y":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "z":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        }
+                    }
+                },
+                {
+                    "helper":true,
+                    "position":{
+                        "x":0.194,
+                        "y":3.394,
+                        "z":1.109
+                    },
+                    "element":"info-point-01-02",
+                    "debug":{
+                        "x":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "y":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "z":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        }
+                    }
                 }
             ]
         }

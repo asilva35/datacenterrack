@@ -32,6 +32,13 @@
     width: 40px;
     height: 40px;
     transform: translate(-50%,-50%);
+    opacity: 0;
+    transition: all 0.2s linear;
+    cursor: pointer;
+}
+
+.point.visible{
+    opacity: 1;
 }
 
 .pointBorder{
@@ -42,7 +49,7 @@
     height: 20px;
     border-radius: 50%;
     border: solid 1px #5195FB;
-    transform: scale(1) translate(-50%,-50%);
+    transform: translate(-50%,-50%);
     animation: pointBorderAnim 1s linear infinite;
 }
 
