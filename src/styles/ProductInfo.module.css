@@ -28,6 +28,7 @@
     height: 16px;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
 }
 
 .close{
@@ -41,14 +42,30 @@
     height: auto;
 }
 
+.back{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap:5px;
+    cursor: pointer;
+}
+
 .body{
     width: 100%;
     min-height: 100px;
     padding: 20px;
+} 
+
+.ProductText{
+    display: block;
     display: flex;
     flex-direction: row;
     gap: 20px;
     flex-wrap: wrap;
+}
+
+.ProductText.hide{
+    display: none;
 }
 
 .textCnt{

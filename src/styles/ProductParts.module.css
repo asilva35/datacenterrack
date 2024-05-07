@@ -1,0 +1,21 @@
+.ProductParts{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.wrapper{
+    width: 100%;
+    max-width: 300px;
+}
+
+.Tabs{
+    width: 100%;
+    
+}
+
+.Table{
+    width: 100%;
+}

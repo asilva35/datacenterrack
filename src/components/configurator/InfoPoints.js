@@ -7,16 +7,26 @@ export default function InfoPoints(props) {
   const { state, dispatch } = useContext(AppContext);
   const [show, setShow] = useState(false);
   useEffect(() => {
-    if (state.showProductInfo) {
+    if (state.showProductInfo && !state.showProductPartInfo) {
       setShow(true);
     } else {
       setShow(false);
     }
-  }, [state.is360view, state.showProductInfo]);
+  }, [state.showProductInfo, state.showProductPartInfo]);
+  const onClickPoint = (point) => {
+    dispatch({
+      type: 'ON_CLICK_INFO_POINT',
+      currentInfoPoint: point,
+    });
+    dispatch({
+      type: 'SHOW_PRODUCT_PART_INFO',
+      showProductPartInfo: true,
+    });
+  };
   return (
     <div className={`${styles.InfoPoints} ${show ? styles.show : ''}`}>
       <div className={`${styles.wrapper}`}>
-        <div className={`${styles.points}`}>
+        <div className={`${styles.points} info-point`}>
           {config.products.map((product, i) => {
             return (
               <div
@@ -28,6 +38,9 @@ export default function InfoPoints(props) {
                     <div
                       key={`product-info-point-${ii}`}
                       className={`${styles.point} ${point.element}`}
+                      onClick={() => {
+                        onClickPoint(point);
+                      }}
                     >
                       <div className={`${styles.pointBorder}`}>
                         <div className={`${styles.pointBody}`}></div>
@@ -38,13 +51,6 @@ export default function InfoPoints(props) {
               </div>
             );
           })}
-          {/* <div
-            className={`${styles.point} ${config.products[0].infoPoints[0].element}`}
-          >
-            <div className={`${styles.pointBorder}`}>
-              <div className={`${styles.pointBody}`}></div>
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

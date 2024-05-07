@@ -12,10 +12,13 @@ let initialState = {
   show3DModel: false,
   showDebug: false,
   showProductInfo: false,
+  showProductPartInfo: false,
   loading: {
     progress: 0,
     text: 'Loading Progress: 0%',
   },
+  currentInfoPoint: null,
+  countInfoPointsClicked: 0,
 };
 
 let reducer = (state, action) => {
@@ -56,20 +59,33 @@ let reducer = (state, action) => {
         showProductInfo: action.showProductInfo,
       };
     }
+    case 'SHOW_PRODUCT_PART_INFO': {
+      return {
+        ...state,
+        showProductPartInfo: action.showProductPartInfo,
+      };
+    }
     case 'SHOW_DEBUG': {
       return {
         ...state,
         showDebug: action.showDebug,
       };
     }
-    case 'SET_LOADING':
+    case 'SET_LOADING': {
+      return {
+        ...state,
+        loading: {
+          progress: action.loading.progress,
+          text: action.loading.text,
+        },
+      };
+    }
+    case 'ON_CLICK_INFO_POINT':
       {
         return {
           ...state,
-          loading: {
-            progress: action.loading.progress,
-            text: action.loading.text,
-          },
+          currentInfoPoint: action.currentInfoPoint,
+          countInfoPointsClicked: state.countInfoPointsClicked + 1,
         };
       }
       throw Error('Unknown action: ' + action.type);

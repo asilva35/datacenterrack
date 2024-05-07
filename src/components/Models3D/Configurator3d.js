@@ -5,30 +5,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
-// import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-// import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-// import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-//import { UnrealBloomPass } from '@/lib/UnrealBloomPass';
-//import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-//import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
 import styles from '@/styles/Configurator3d.module.css';
-
 import fragmentShader from '@/shaders/fragment.glsl';
 import vertexShader from '@/shaders/vertex.glsl';
-
 import { AppContext } from '@/context/AppContext';
-
 import Stats from 'three/examples/jsm/libs/stats.module';
-
 import { Debug } from '@/debug/Configurator3d';
 
 class Model3dScene {
   constructor(options) {
-    const that = this;
     this.THREE = THREE;
     this.container = options.dom;
     this.overlay = options.overlay;
@@ -38,12 +24,47 @@ class Model3dScene {
     this.onLoadingProgress = options.onLoadingProgress;
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
-
+    this.clock = new this.THREE.Clock();
     this.scene = new this.THREE.Scene();
+    this.showPointsInfo = false;
 
     if (this.config.scene.bgColor)
       this.scene.background = new THREE.Color(this.config.scene.bgColor);
 
+    this.configRenderer();
+
+    this.createCamera();
+
+    this.addObjects();
+
+    this.addPostProcessing();
+
+    this.pointerMoveEvent();
+
+    // Inicia la animación
+    this.tick();
+  }
+
+  configRenderer() {
+    // Crea un renderizador
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.container,
+      antialias: this.config.scene.antialias,
+      alpha: this.config.scene.alpha,
+    });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setClearColor(0x000000, 0);
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.toneMapping = THREE.LinearToneMapping;
+    this.renderer.toneMappingExposure = this.config.scene.toneMappingExposure;
+    this.renderer.shadowMap.enabled = true;
+    //this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.renderer.shadowMap.type = THREE.VSMShadowMap;
+  }
+
+  createCamera() {
     // Crea una cámara
     this.camera = new THREE.PerspectiveCamera(
       this.config.camera.fov,
@@ -66,23 +87,6 @@ class Model3dScene {
       )
     );
 
-    // Crea un renderizador
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.container,
-      antialias: this.config.scene.antialias,
-      alpha: this.config.scene.alpha,
-    });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setClearColor(0x000000, 0);
-    this.renderer.physicallyCorrectLights = true;
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
-    this.renderer.toneMapping = THREE.LinearToneMapping;
-    this.renderer.toneMappingExposure = this.config.scene.toneMappingExposure;
-    this.renderer.shadowMap.enabled = true;
-    //this.renderer.shadowMap.type = THREE.PCFShadowMap;
-    this.renderer.shadowMap.type = THREE.VSMShadowMap;
-
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target = new this.THREE.Vector3(0, 0, 0);
     this.controls.minDistance = 0.1;
@@ -101,16 +105,37 @@ class Model3dScene {
     );
     this.controls.enabled = true;
 
-    this.clock = new this.THREE.Clock();
+    this.setCameraHistory({
+      position: {
+        ...this.config.camera.position,
+      },
+      target: {
+        ...this.config.camera.target,
+      },
+    });
+  }
 
-    this.addObjects();
+  setCameraHistory(history) {
+    if (!this.cameraHistory) {
+      this.cameraHistory = [];
+    }
+    this.cameraHistory.push(history);
+  }
 
-    this.addPostProcessing();
-
-    this.pointerMoveEvent();
-
-    // Inicia la animación
-    this.tick();
+  popCameraHistory() {
+    let resp = null;
+    if (!this.cameraHistory) {
+      return resp;
+    }
+    if (this.cameraHistory.length === 1) {
+      resp = this.cameraHistory[0];
+      return resp;
+    }
+    if (this.cameraHistory.length >= 2) {
+      this.cameraHistory.pop();
+      resp = this.cameraHistory[this.cameraHistory.length - 1];
+      return resp;
+    }
   }
 
   pointerMoveEvent() {
@@ -129,7 +154,7 @@ class Model3dScene {
     if (!this.server) return;
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
-      console.log(this.pointer, intersects);
+      //console.log(this.pointer, intersects);
     }
   }
 
@@ -206,6 +231,10 @@ class Model3dScene {
 
   color(r, g, b) {
     return new THREE.Color(r / 255, g / 255, b / 255);
+  }
+
+  degToRadians(deg) {
+    return (deg * Math.PI) / 180.0;
   }
 
   addObjects() {
@@ -314,7 +343,7 @@ class Model3dScene {
           if (child.name === 'info-point-01') {
             this.infoPoint01 = child;
           }
-          if (child.name === 'server-rack-glass-window01') {
+          if (child.name === 'glass') {
             child.material.color = new THREE.Color(
               this.config.server.glass.color.r,
               this.config.server.glass.color.g,
@@ -323,7 +352,7 @@ class Model3dScene {
             child.material.opacity = this.config.server.glass.opacity;
             child.material.roughness = this.config.server.glass.roughness;
           }
-          if (child.name === 'server-rack-01') {
+          if (child.name === 'server-rack') {
             child.traverse((serverRackChild) => {
               if (serverRackChild.name === 'logo-rack') {
                 new THREE.TextureLoader().load(
@@ -516,26 +545,19 @@ class Model3dScene {
 
   enableControls(is360view) {
     if (is360view) {
-      this.previusCameraPosition = {
-        position: { ...this.camera.position },
-        target: { ...this.controls.target },
-      };
       this.overlay.style.display = 'none';
       this.ground.visible = false;
     } else {
       this.overlay.style.display = 'block';
       this.ground.visible = true;
-      if (this.previusCameraPosition) {
+      const previusCameraPosition = this.popCameraHistory();
+      if (previusCameraPosition) {
         gsap.to(this.camera.position, {
-          x: this.previusCameraPosition.position.x,
-          y: this.previusCameraPosition.position.y,
-          z: this.previusCameraPosition.position.z,
+          ...previusCameraPosition.position,
           duration: 1,
         });
         gsap.to(this.controls.target, {
-          x: this.previusCameraPosition.target.x,
-          y: this.previusCameraPosition.target.y,
-          z: this.previusCameraPosition.target.z,
+          ...previusCameraPosition.target,
           duration: 1,
         });
       }
@@ -543,36 +565,160 @@ class Model3dScene {
   }
 
   showProductInfo(showProductInfo) {
+    this.showPointsInfo = showProductInfo;
     if (showProductInfo) {
-      this.previusCameraPosition = {
-        position: { ...this.camera.position },
-        target: { ...this.controls.target },
+      const newCameraPosition = {
+        position: {
+          x: 8.142370217469859,
+          y: 2.926579226214953,
+          z: 2.3138967812666484,
+        },
+        target: {
+          x: -1.2629907825301445,
+          y: 2.446571226214952,
+          z: -5.000993218733351,
+        },
       };
       gsap.to(this.camera.position, {
-        x: 8.142370217469859,
-        y: 2.926579226214953,
-        z: 2.3138967812666484,
+        ...newCameraPosition.position,
         duration: 1,
       });
       gsap.to(this.controls.target, {
-        x: -1.2629907825301445,
-        y: 2.446571226214952,
-        z: -5.000993218733351,
+        ...newCameraPosition.target,
         duration: 1,
       });
+      this.setCameraHistory(newCameraPosition);
     } else {
-      if (this.previusCameraPosition) {
+      const previusCameraPosition = this.popCameraHistory();
+      if (previusCameraPosition) {
         gsap.to(this.camera.position, {
-          x: this.previusCameraPosition.position.x,
-          y: this.previusCameraPosition.position.y,
-          z: this.previusCameraPosition.position.z,
+          ...previusCameraPosition.position,
           duration: 1,
         });
         gsap.to(this.controls.target, {
-          x: this.previusCameraPosition.target.x,
-          y: this.previusCameraPosition.target.y,
-          z: this.previusCameraPosition.target.z,
+          ...previusCameraPosition.target,
           duration: 1,
+        });
+      }
+    }
+  }
+
+  showProductPartInfo(currentInfoPoint, showProductPartInfo) {
+    if (!currentInfoPoint) return;
+    if (currentInfoPoint.element === 'info-point-01-02') {
+      this.showPointsInfo = false;
+      if (showProductPartInfo) {
+        if (currentInfoPoint.onClick && currentInfoPoint.onClick.camera) {
+          const newCameraPosition = {
+            position: {
+              x: currentInfoPoint.onClick.camera.position.x,
+              y: currentInfoPoint.onClick.camera.position.y,
+              z: currentInfoPoint.onClick.camera.position.z,
+            },
+            target: {
+              x: currentInfoPoint.onClick.camera.target.x,
+              y: currentInfoPoint.onClick.camera.target.y,
+              z: currentInfoPoint.onClick.camera.target.z,
+            },
+          };
+          gsap.to(this.camera.position, {
+            ...newCameraPosition.position,
+          });
+          gsap.to(this.controls.target, {
+            ...newCameraPosition.target,
+          });
+          this.setCameraHistory(newCameraPosition);
+        }
+      } else {
+        const previusCameraPosition = this.popCameraHistory();
+        if (previusCameraPosition) {
+          gsap.to(this.camera.position, {
+            ...previusCameraPosition.position,
+            duration: 1,
+          });
+          gsap.to(this.controls.target, {
+            ...previusCameraPosition.target,
+            duration: 1,
+          });
+        }
+      }
+      if (currentInfoPoint.onClick && currentInfoPoint.onClick.animations) {
+        this.server.traverse((child) => {
+          if (currentInfoPoint.onClick.animations[child.name]) {
+            const animation = structuredClone(
+              currentInfoPoint.onClick.animations[child.name]
+            );
+            if (animation.visible === false) {
+              child.visible = showProductPartInfo ? false : true;
+            } else if (animation.visible === true) {
+              child.visible = showProductPartInfo ? true : false;
+            }
+            if (animation.position) {
+              if (!showProductPartInfo) {
+                if (animation.position.x) {
+                  if (animation.position.x.search('-=') !== -1) {
+                    animation.position.x = animation.position.x.replace(
+                      '-=',
+                      '+='
+                    );
+                  } else {
+                    animation.position.x = animation.position.x.replace(
+                      '+=',
+                      '-='
+                    );
+                  }
+                }
+
+                if (animation.position.y) {
+                  if (animation.position.y.search('-=') !== -1) {
+                    animation.position.y = animation.position.y.replace(
+                      '-=',
+                      '+='
+                    );
+                  } else {
+                    animation.position.y = animation.position.y.replace(
+                      '+=',
+                      '-='
+                    );
+                  }
+                }
+
+                if (animation.position.z) {
+                  if (animation.position.z.search('-=') !== -1) {
+                    animation.position.z = animation.position.z.replace(
+                      '-=',
+                      '+='
+                    );
+                  } else {
+                    animation.position.z = animation.position.z.replace(
+                      '+=',
+                      '-='
+                    );
+                  }
+                }
+              }
+              gsap.to(child.position, {
+                ...animation.position,
+              });
+            }
+            if (animation.rotation) {
+              if (animation.rotation.x)
+                animation.rotation.x = showProductPartInfo
+                  ? this.degToRadians(animation.rotation.x)
+                  : 0;
+              if (animation.rotation.y)
+                animation.rotation.y = showProductPartInfo
+                  ? this.degToRadians(animation.rotation.y)
+                  : 0;
+              if (animation.rotation.z)
+                animation.rotation.z = showProductPartInfo
+                  ? this.degToRadians(animation.rotation.z)
+                  : 0;
+              gsap.to(child.rotation, {
+                ...animation.rotation,
+              });
+            }
+          }
         });
       }
     }
@@ -594,24 +740,12 @@ class Model3dScene {
     }
     this.scene.environment = this.environmentMap;
   }
-  // Función para actualizar la escena
-  tick() {
-    if (this.controls.enabled) this.controls.update();
 
-    requestAnimationFrame(this.tick.bind(this));
-
-    const elapsedTime = this.clock.getElapsedTime();
-
-    if (this.config.scene.bgMesh.rotation && this.bgMaterial && this.bgMesh) {
-      //this.bgMaterial.uniforms.uTime.value = elapsedTime;
-      this.bgMesh.rotation.z += 0.001;
-    }
-
-    if (this.server) {
+  renderInfoPoints() {
+    if (this.server && this.showPointsInfo) {
       this.config.products.forEach((product) => {
         if (product.infoPoints) {
           product.infoPoints.forEach((point) => {
-            //const point = this.config.products[0].infoPoints[0];
             const pointPosition = new THREE.Vector3(
               point.position.x,
               point.position.y,
@@ -630,6 +764,8 @@ class Model3dScene {
             if (intersects.length === 0) {
               // Show
               pointElement.style.opacity = 1;
+              pointElement.style.cursor = 'pointer';
+              pointElement.style.pointerEvents = 'all';
             } else {
               // Get the distance of the intersection and the distance of the point
 
@@ -642,11 +778,15 @@ class Model3dScene {
               if (intersectionDistance < pointDistance) {
                 // Hide
                 pointElement.style.opacity = 0;
+                pointElement.style.cursor = 'none';
+                pointElement.style.pointerEvents = 'none';
               }
               // Intersection is further than the point
               else {
                 // Show
                 pointElement.style.opacity = 1;
+                pointElement.style.cursor = 'pointer';
+                pointElement.style.pointerEvents = 'all';
               }
             }
 
@@ -663,6 +803,22 @@ class Model3dScene {
         }
       });
     }
+  }
+
+  // Función para actualizar la escena
+  tick() {
+    if (this.controls.enabled) this.controls.update();
+
+    requestAnimationFrame(this.tick.bind(this));
+
+    const elapsedTime = this.clock.getElapsedTime();
+
+    if (this.config.scene.bgMesh.rotation && this.bgMaterial && this.bgMesh) {
+      //this.bgMaterial.uniforms.uTime.value = elapsedTime;
+      this.bgMesh.rotation.z += 0.001;
+    }
+
+    this.renderInfoPoints();
 
     // Renderiza la escena con la cámara
     this.renderer.render(this.scene, this.camera);
@@ -735,6 +891,21 @@ export default function Configurator3d(props) {
       model3d.showProductInfo(state.showProductInfo);
     }
   }, [state.showProductInfo]);
+
+  // useEffect(() => {
+  //   if (state.show3DModel && model3d) {
+  //     model3d.showProductPartInfo(state.currentInfoPoint);
+  //   }
+  // }, [state.countInfoPointsClicked]);
+
+  useEffect(() => {
+    if (state.show3DModel && model3d) {
+      model3d.showProductPartInfo(
+        state.currentInfoPoint,
+        state.showProductPartInfo
+      );
+    }
+  }, [state.showProductPartInfo]);
 
   return (
     <>

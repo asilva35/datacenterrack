@@ -188,8 +188,8 @@
                     "helper":true,
                     "position":{
                         "x":1.109,
-                        "y":5.039,
-                        "z":-0.572
+                        "y":4.309,
+                        "z":-0.263
                     },
                     "element":"info-point-01-01",
                     "debug":{
@@ -218,6 +218,132 @@
                         "z":1.109
                     },
                     "element":"info-point-01-02",
+                    "debug":{
+                        "x":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "y":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "z":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        }
+                    },
+                    "onClick":{
+                        "camera":{
+                            "position":{
+                                "x":8.653764358294813,
+                                "y":4.047596905470338,
+                                "z":9.922130299837015
+                            },
+                            "target":{
+                                "x":-1.6348670384675958,
+                                "y":1.8982365064518711,
+                                "z":-4.02680337045846
+                            }                        
+                        },
+                        "animations":{
+                            "glass":{
+                                "visible":false
+                            },
+                            "servers-units":{
+                                "visible":false
+                            },
+                            "front-side-rack":{
+                                "position":{
+                                    "x":"-=2",
+                                    "z":"+=3",
+                                    "duration":1
+                                }
+                            },
+                            "top-side-rack":{
+                                "position":{
+                                    "x": "+=4.25",
+                                    "y": "+=4",
+                                    "z": "-=3",
+                                    "duration":1
+                                },
+                                "rotation":{
+                                    "z":90,
+                                    "duration":1
+                                }
+                            },
+                            "bottom-side-rack":{
+                                "position":{
+                                    "x": "-=1",
+                                    "y": "+=1",
+                                    "z": "-=3",
+                                    "duration":1
+                                },
+                                "rotation":{
+                                    "z":90,
+                                    "duration":1
+                                }
+                            },
+                            "left-side-rack":{
+                                "position":{
+                                    "x": "-=2",
+                                    "z": "+=6",
+                                    "duration":1
+                                },
+                                "rotation":{
+                                    "y":90,
+                                    "duration":1
+                                }
+                            },
+                            "right-side-rack":{
+                                "position":{
+                                    "z": "-=6",
+                                    "duration":1
+                                },
+                                "rotation":{
+                                    "y":90,
+                                    "duration":1
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "helper":true,
+                    "position":{
+                        "x":1.109,
+                        "y":2.937,
+                        "z":-0.72
+                    },
+                    "element":"info-point-01-03",
+                    "debug":{
+                        "x":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "y":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        },
+                        "z":{
+                            "min":-10,
+                            "max":10,
+                            "step":0.001
+                        }
+                    }
+                },
+                {
+                    "helper":true,
+                    "position":{
+                        "x":1.109,
+                        "y":0.194,
+                        "z":0.194
+                    },
+                    "element":"info-point-01-04",
                     "debug":{
                         "x":{
                             "min":-10,
