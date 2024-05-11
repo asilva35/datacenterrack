@@ -202,38 +202,40 @@ class Model3dScene {
     this.overlay.classList.add(styles.hide);
     const animation = this.getAnimation('Initial');
     if (!animation) return;
-    const cameraPosition = {
-      position: {
-        ...this.camera.position,
+    const tl = gsap.timeline({
+      paused: true,
+      onStart: () => {
+        if (this.server) this.server.visible = true;
+        if (this.ground) this.ground.visible = true;
       },
-      target: {
-        ...this.controls.target,
-      },
-    };
-    this.controls.enabled = false;
-    this.camera.position.set(
-      animation.objects[0].animation.position.x,
-      animation.objects[0].animation.position.y,
-      animation.objects[0].animation.position.z
-    );
-    this.controls.target.set(
-      animation.objects[0].animation.target.x,
-      animation.objects[0].animation.target.y,
-      animation.objects[0].animation.target.z
-    );
-    this.controls.update();
-    this.controls.enabled = true;
-
-    if (this.server) this.server.visible = true;
-    if (this.ground) this.ground.visible = true;
-    gsap.to(this.camera.position, {
-      ...cameraPosition.position,
-      duration: animation.objects[0].animation.duration,
     });
-    gsap.to(this.controls.target, {
-      ...cameraPosition.target,
-      duration: animation.objects[0].animation.duration,
+    let time = 0;
+    animation.keyframes.forEach((keyframe) => {
+      let duration = keyframe.second - time;
+      time = duration;
+      if (duration === 0) duration = 0.01;
+      keyframe.objects.forEach((object) => {
+        if (object.name === 'camera') {
+          tl.to(
+            this.camera.position,
+            {
+              ...object.animation.position,
+              duration,
+            },
+            keyframe.second
+          );
+          tl.to(
+            this.controls.target,
+            {
+              ...object.animation.target,
+              duration,
+            },
+            keyframe.second
+          );
+        }
+      });
     });
+    tl.play();
   }
 
   color(r, g, b) {
