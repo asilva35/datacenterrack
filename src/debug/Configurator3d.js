@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
+import studio from '@theatre/studio';
+import { getProject, types } from '@theatre/core';
+
 function onChangeInfoPoint(scene, camera, point, value, dimension) {
   const pointElement = document.querySelector(`.${point.element}`);
   const screenPosition = new THREE.Vector3(
@@ -50,7 +53,33 @@ export class Debug {
     this.debugBloom();
     this.debugBokeh();
 
+    this.addStudio();
+
     this.getCurrentConfig();
+  }
+
+  addStudio() {
+    studio.initialize();
+    const project = getProject('THREE.js x Theatre.js');
+    const sheet = project.sheet('Animated scene');
+    this.scene.traverse((child) => {
+      if (child.name === 'server-rack') {
+        const serverObj = sheet.object('Server Rack', {
+          // Note that the rotation is in radians
+          // (full rotation: 2 * Math.PI)
+          rotation: types.compound({
+            x: types.number(child.rotation.x, { range: [-2, 2] }),
+            y: types.number(child.rotation.y, { range: [-2, 2] }),
+            z: types.number(child.rotation.z, { range: [-2, 2] }),
+          }),
+        });
+        serverObj.onValuesChange((values) => {
+          const { x, y, z } = values.rotation;
+
+          child.rotation.set(x * Math.PI, y * Math.PI, z * Math.PI);
+        });
+      }
+    });
   }
 
   addModalExport() {
