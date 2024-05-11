@@ -19,3 +19,17 @@
 .Table{
     width: 100%;
 }
+
+.TableRow{
+    cursor: pointer;
+}
+
+.TableRow td{
+    /* padding: 0!important; */
+    pointer-events: none;
+}
+
+.TableCell{
+    display: flex;
+    pointer-events: all;
+}

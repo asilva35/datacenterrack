@@ -13,6 +13,7 @@ let initialState = {
   showDebug: false,
   showProductInfo: false,
   showProductPartInfo: false,
+  currentPartSelected: null,
   loading: {
     progress: 0,
     text: 'Loading Progress: 0%',
@@ -80,12 +81,18 @@ let reducer = (state, action) => {
         },
       };
     }
-    case 'ON_CLICK_INFO_POINT':
+    case 'ON_CLICK_INFO_POINT': {
+      return {
+        ...state,
+        currentInfoPoint: action.currentInfoPoint,
+        countInfoPointsClicked: state.countInfoPointsClicked + 1,
+      };
+    }
+    case 'SELECT_PRODUCT_PART':
       {
         return {
           ...state,
-          currentInfoPoint: action.currentInfoPoint,
-          countInfoPointsClicked: state.countInfoPointsClicked + 1,
+          currentPartSelected: action.currentPartSelected,
         };
       }
       throw Error('Unknown action: ' + action.type);

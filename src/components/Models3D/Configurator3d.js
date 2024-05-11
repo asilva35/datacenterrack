@@ -20,6 +20,7 @@ class Model3dScene {
     this.overlay = options.overlay;
     this.debug = options.debug;
     this.config = options.config;
+    this.animations = options.animations;
     this.onload = options.onload;
     this.onLoadingProgress = options.onLoadingProgress;
     this.raycaster = new THREE.Raycaster();
@@ -190,42 +191,48 @@ class Model3dScene {
     // );
   }
 
+  getAnimation(name) {
+    if (!this.animations) return null;
+    return this.animations.find((anim) => {
+      return anim.name === name ? anim : null;
+    });
+  }
+
   show(styles) {
-    const camera_position = { ...this.camera.position };
-    const control_target = { ...this.controls.target };
+    this.overlay.classList.add(styles.hide);
+    const animation = this.getAnimation('Initial');
+    if (!animation) return;
+    const cameraPosition = {
+      position: {
+        ...this.camera.position,
+      },
+      target: {
+        ...this.controls.target,
+      },
+    };
     this.controls.enabled = false;
-    //Object { x: 11.922266210737236, y: 2.3482254808524234, z: 3.489137788298752, _gsap: {…} }
     this.camera.position.set(
-      11.922266210737236,
-      2.3482254808524234,
-      3.489137788298752
+      animation.objects[0].animation.position.x,
+      animation.objects[0].animation.position.y,
+      animation.objects[0].animation.position.z
     );
-    //Object { x: 2.61036913119999, y: 2.1805110557110416, z: 9.22913291643659, _gsap: {…} }
     this.controls.target.set(
-      2.61036913119999,
-      2.1805110557110416,
-      9.22913291643659
+      animation.objects[0].animation.target.x,
+      animation.objects[0].animation.target.y,
+      animation.objects[0].animation.target.z
     );
     this.controls.update();
     this.controls.enabled = true;
-    this.overlay.classList.add(styles.hide);
+
     if (this.server) this.server.visible = true;
     if (this.ground) this.ground.visible = true;
     gsap.to(this.camera.position, {
-      x: camera_position.x,
-      y: camera_position.y,
-      z: camera_position.z,
-      duration: 1,
-      onStart: () => {
-        if (this.server) this.server.visible = true;
-        if (this.ground) this.ground.visible = true;
-      },
+      ...cameraPosition.position,
+      duration: animation.objects[0].animation.duration,
     });
     gsap.to(this.controls.target, {
-      x: control_target.x,
-      y: control_target.y,
-      z: control_target.z,
-      duration: 1,
+      ...cameraPosition.target,
+      duration: animation.objects[0].animation.duration,
     });
   }
 
@@ -434,6 +441,7 @@ class Model3dScene {
 
     this.ground = new THREE.Mesh(geometryGround, materialGround);
     this.ground.receiveShadow = true;
+    this.ground.name = 'ground';
     this.scene.add(this.ground);
     this.ground.visible = false;
 
@@ -565,27 +573,20 @@ class Model3dScene {
   }
 
   showProductInfo(showProductInfo) {
+    const animation = this.getAnimation('ViewInfoProduct01');
+    if (!animation) return;
     this.showPointsInfo = showProductInfo;
     if (showProductInfo) {
       const newCameraPosition = {
-        position: {
-          x: 8.142370217469859,
-          y: 2.926579226214953,
-          z: 2.3138967812666484,
-        },
-        target: {
-          x: -1.2629907825301445,
-          y: 2.446571226214952,
-          z: -5.000993218733351,
-        },
+        ...animation.objects[0].animation,
       };
       gsap.to(this.camera.position, {
         ...newCameraPosition.position,
-        duration: 1,
+        duration: animation.objects[0].animation.duration,
       });
       gsap.to(this.controls.target, {
         ...newCameraPosition.target,
-        duration: 1,
+        duration: animation.objects[0].animation.duration,
       });
       this.setCameraHistory(newCameraPosition);
     } else {
@@ -724,6 +725,63 @@ class Model3dScene {
     }
   }
 
+  selectProductPart(currentPartSelected) {
+    if (!currentPartSelected) return;
+    this.server.traverse((child) => {
+      if (child.name === 'left-side-rack') {
+        if (currentPartSelected.id === 1) {
+          child.selected = true;
+          child.lastPosition = { ...child.position };
+          child.lastRotation = { ...child.rotation };
+          // gsap.to(child.position, {
+          //   x: '+=6',
+          //   z: '-=2',
+          // });
+          gsap.to(child.position, {
+            x: '+=1',
+            z: '-=1',
+          });
+          gsap.to(child.rotation, {
+            y: this.degToRadians(33),
+          });
+        } else if (child.selected) {
+          gsap.to(child.position, {
+            ...child.lastPosition,
+          });
+          gsap.to(child.rotation, {
+            ...child.lastRotation,
+          });
+        }
+      } else if (child.name === 'right-side-rack') {
+        if (currentPartSelected.id === 2) {
+          child.selected = true;
+          child.lastPosition = { ...child.position };
+          child.lastRotation = { ...child.rotation };
+          gsap.to(child.position, {
+            x: '+=5',
+            z: '+=10',
+          });
+          gsap.to(child.rotation, {
+            y: this.degToRadians(33),
+          });
+        } else if (child.selected) {
+          gsap.to(child.position, {
+            ...child.lastPosition,
+          });
+          gsap.to(child.rotation, {
+            ...child.lastRotation,
+          });
+        }
+      } else if (child.name === 'left-side-rack-holes') {
+        child.visible = false;
+        // } else if (child.name !== 'server-rack') {
+        //   gsap.to(child.position, {
+        //     x: '-=200',
+        //   });
+      }
+    });
+  }
+
   addCubeTexture(n) {
     this.cubeTextLoader = new THREE.CubeTextureLoader();
     this.environmentMap = this.cubeTextLoader.load([
@@ -832,7 +890,7 @@ class Model3dScene {
 }
 
 export default function Configurator3d(props) {
-  const { debug, config } = props;
+  const { debug, config, animations } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
@@ -864,6 +922,7 @@ export default function Configurator3d(props) {
       overlay: model3dOverlay.current,
       debug,
       config,
+      animations,
       onLoadingProgress: onLoadingProgress,
       onload: onLoadModels,
     });
@@ -906,6 +965,12 @@ export default function Configurator3d(props) {
       );
     }
   }, [state.showProductPartInfo]);
+
+  useEffect(() => {
+    if (state.show3DModel && model3d) {
+      model3d.selectProductPart(state.currentPartSelected);
+    }
+  }, [state.currentPartSelected]);
 
   return (
     <>

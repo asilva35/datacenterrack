@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
 import configJson from '@/config/configurator/config.json';
+import animationsJson from '@/config/configurator/animations.json';
 import TextRotated from '@/components/configurator/TextRotated';
 import HeaderInfo from '@/components/configurator/HeaderInfo';
 import FooterMenu from '@/components/configurator/FooterMenu';
@@ -27,6 +28,7 @@ const Configurator3d = dynamic(
 
 export default function Configurator() {
   const [config, setConfig] = useState(configJson);
+  const [animations, setAnimations] = useState(animationsJson);
   const [showDebug, setShowDebug] = useState(false);
   const { state, dispatch } = useContext(AppContext);
 
@@ -71,7 +73,11 @@ export default function Configurator() {
         <InfoPoints config={config} />
         <FooterMenu />
       </Layout>
-      <Configurator3d debug={showDebug} config={config} />
+      <Configurator3d
+        debug={showDebug}
+        config={config}
+        animations={animations}
+      />
       <BG />
     </>
   );

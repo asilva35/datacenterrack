@@ -40,6 +40,7 @@ export class Debug {
 
     this.addModalExport();
 
+    this.addObjects();
     this.debugBg();
     this.debugServer();
     this.debugInfoPoints();
@@ -97,6 +98,38 @@ export class Debug {
         // Alert the copied text
         alert('Copied to clipboard');
       }
+    });
+  }
+
+  addObjects(folderName = 'Scene', object = null, parentFolder = null) {
+    if (!object) object = this.scene;
+    if (!parentFolder) parentFolder = this.gui;
+    const folder = parentFolder.addFolder(folderName);
+    folder.add({ type: object.type }, 'type').name('Type');
+
+    if (object.type === 'Mesh') {
+      const folderPosition = folder.addFolder('position');
+      folderPosition.add(object.position, 'x', -100, 100, 0.01);
+      folderPosition.add(object.position, 'y', -100, 100, 0.01);
+      folderPosition.add(object.position, 'z', -100, 100, 0.01);
+
+      const folderScale = folder.addFolder('scale');
+      folderScale.add(object.scale, 'x', 0, 100, 0.01);
+      folderScale.add(object.scale, 'y', 0, 100, 0.01);
+      folderScale.add(object.scale, 'z', 0, 100, 0.01);
+
+      const folderRotation = folder.addFolder('rotation');
+      folderRotation.add(object.rotation, 'x', 0, 2 * Math.PI, 0.01);
+      folderRotation.add(object.rotation, 'y', 0, 2 * Math.PI, 0.01);
+      folderRotation.add(object.rotation, 'z', 0, 2 * Math.PI, 0.01);
+    }
+
+    const folderChildren = folder.addFolder('Children');
+
+    object.children.forEach((child) => {
+      const rand = Number.parseInt(Math.random() * 100000000);
+      const childFolderName = child.name || `Unknown Object-${rand}`;
+      this.addObjects(childFolderName, child, folderChildren);
     });
   }
 
@@ -289,7 +322,6 @@ export class Debug {
       }
       if (child.name === 'logo-rack') {
         const folderLogo = folder.addFolder('Logo');
-        console.log(child.material);
         folderLogo
           .add(child.material, 'roughness', 0, 1, 0.001)
           .onChange((value) => {
