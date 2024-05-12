@@ -6,6 +6,8 @@ import { useRouter } from 'next/router';
 
 import configJson from '@/config/configurator/config.json';
 import animationsJson from '@/config/configurator/animations.json';
+import animationState from '@/config/configurator/studio.json';
+
 import TextRotated from '@/components/configurator/TextRotated';
 import HeaderInfo from '@/components/configurator/HeaderInfo';
 import FooterMenu from '@/components/configurator/FooterMenu';
@@ -77,6 +79,7 @@ export default function Configurator() {
         debug={showDebug}
         config={config}
         animations={animations}
+        animationState={animationState}
       />
       <BG />
     </>

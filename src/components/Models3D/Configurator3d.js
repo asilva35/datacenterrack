@@ -11,7 +11,18 @@ import fragmentShader from '@/shaders/fragment.glsl';
 import vertexShader from '@/shaders/vertex.glsl';
 import { AppContext } from '@/context/AppContext';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import { Debug } from '@/debug/Configurator3d';
+
+import studio from '@theatre/studio';
+import { getProject, types } from '@theatre/core';
+
+import dynamic from 'next/dynamic';
+
+const DebugComponent = dynamic(
+  () => import('@/components/configurator/DebugComponent'),
+  {
+    ssr: false,
+  }
+);
 
 class Model3dScene {
   constructor(options) {
@@ -21,6 +32,7 @@ class Model3dScene {
     this.debug = options.debug;
     this.config = options.config;
     this.animations = options.animations;
+    this.animationState = options.animationState;
     this.onload = options.onload;
     this.onLoadingProgress = options.onLoadingProgress;
     this.raycaster = new THREE.Raycaster();
@@ -199,43 +211,81 @@ class Model3dScene {
   }
 
   show(styles) {
-    this.overlay.classList.add(styles.hide);
-    const animation = this.getAnimation('Initial');
-    if (!animation) return;
-    const tl = gsap.timeline({
-      paused: true,
-      onStart: () => {
-        if (this.server) this.server.visible = true;
-        if (this.ground) this.ground.visible = true;
-      },
+    if (this.sequence) {
+      if (this.server) this.server.visible = true;
+      if (this.ground) this.ground.visible = true;
+      this.sequence.play({ range: [0, 1] });
+    }
+    // const project = getProject('DataCenterRack-3D-Configurator', {
+    //   state: this.animationState,
+    // });
+    // const sheet = project.sheet('Main-Scene');
+
+    // this.addStudioCamera(sheet);
+
+    // project.ready.then(() => {
+    //   if (this.server) this.server.visible = true;
+    //   if (this.ground) this.ground.visible = true;
+    //   sheet.sequence.play();
+    // });
+
+    // const animation = this.getAnimation('Initial');
+    // if (!animation) return;
+    // const tl = gsap.timeline({
+    //   paused: true,
+    //   onStart: () => {
+    //     if (this.server) this.server.visible = true;
+    //     if (this.ground) this.ground.visible = true;
+    //   },
+    // });
+    // let time = 0;
+    // animation.keyframes.forEach((keyframe) => {
+    //   let duration = keyframe.second - time;
+    //   time = duration;
+    //   if (duration === 0) duration = 0.01;
+    //   keyframe.objects.forEach((object) => {
+    //     if (object.name === 'camera') {
+    //       tl.to(
+    //         this.camera.position,
+    //         {
+    //           ...object.animation.position,
+    //           duration,
+    //         },
+    //         keyframe.second
+    //       );
+    //       tl.to(
+    //         this.controls.target,
+    //         {
+    //           ...object.animation.target,
+    //           duration,
+    //         },
+    //         keyframe.second
+    //       );
+    //     }
+    //   });
+    // });
+    // tl.play();
+  }
+
+  addStudioCamera(sheet) {
+    const serverObj = sheet.object('Camera', {
+      position: types.compound({
+        xp: types.number(this.camera.position.x, { range: [-100, 100] }),
+        yp: types.number(this.camera.position.y, { range: [-100, 100] }),
+        zp: types.number(this.camera.position.z, { range: [-100, 100] }),
+      }),
+      target: types.compound({
+        xt: types.number(this.controls.target.x, { range: [-100, 100] }),
+        yt: types.number(this.controls.target.y, { range: [-100, 100] }),
+        zt: types.number(this.controls.target.z, { range: [-100, 100] }),
+      }),
     });
-    let time = 0;
-    animation.keyframes.forEach((keyframe) => {
-      let duration = keyframe.second - time;
-      time = duration;
-      if (duration === 0) duration = 0.01;
-      keyframe.objects.forEach((object) => {
-        if (object.name === 'camera') {
-          tl.to(
-            this.camera.position,
-            {
-              ...object.animation.position,
-              duration,
-            },
-            keyframe.second
-          );
-          tl.to(
-            this.controls.target,
-            {
-              ...object.animation.target,
-              duration,
-            },
-            keyframe.second
-          );
-        }
-      });
+    serverObj.onValuesChange((values) => {
+      const { xp, yp, zp } = values.position;
+      const { xt, yt, zt } = values.target;
+      this.camera.position.set(xp, yp, zp);
+      this.controls.target.set(xt, yt, zt);
     });
-    tl.play();
   }
 
   color(r, g, b) {
@@ -535,22 +585,24 @@ class Model3dScene {
   debugModel() {
     this.stats = new Stats();
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    this.stats.dom.style.left = '50px';
     document.body.appendChild(this.stats.dom);
 
-    new Debug({
-      debugObject: this.config,
-      camera: this.camera,
-      bloomPass: this.bloomPass,
-      //bokehPass: this.bokehPass,
-      renderer: this.renderer,
-      scene: this.scene,
-      controls: this.controls,
-      bgMaterial: this.bgMaterial,
-      bgMesh: this.bgMesh,
-      floor: this.floor,
-      cube: this.cube,
-      environmentMap: this.environmentMap,
-    });
+    // new Debug({
+    //   debugObject: this.config,
+    //   camera: this.camera,
+    //   bloomPass: this.bloomPass,
+    //   //bokehPass: this.bokehPass,
+    //   renderer: this.renderer,
+    //   scene: this.scene,
+    //   controls: this.controls,
+    //   bgMaterial: this.bgMaterial,
+    //   bgMesh: this.bgMesh,
+    //   floor: this.floor,
+    //   cube: this.cube,
+    //   environmentMap: this.environmentMap,
+    //   animationState: this.animationState,
+    // });
   }
 
   enableControls(is360view) {
@@ -577,6 +629,8 @@ class Model3dScene {
   showProductInfo(showProductInfo) {
     const animation = this.getAnimation('ViewInfoProduct01');
     if (!animation) return;
+    this.sequence.play({ range: [1, 2] });
+    return;
     this.showPointsInfo = showProductInfo;
     if (showProductInfo) {
       const newCameraPosition = {
@@ -865,6 +919,10 @@ class Model3dScene {
     }
   }
 
+  setAnimationSequence(sequence) {
+    this.sequence = sequence;
+  }
+
   // Función para actualizar la escena
   tick() {
     if (this.controls.enabled) this.controls.update();
@@ -892,7 +950,7 @@ class Model3dScene {
 }
 
 export default function Configurator3d(props) {
-  const { debug, config, animations } = props;
+  const { debug, config, animations, animationState } = props;
   const canvasRef = useRef();
   const model3dOverlay = useRef();
   const flag = useRef();
@@ -925,11 +983,28 @@ export default function Configurator3d(props) {
       debug,
       config,
       animations,
+      animationState,
       onLoadingProgress: onLoadingProgress,
       onload: onLoadModels,
     });
     if (debug) document.model3d = _model3d;
-    setModel3D(_model3d);
+
+    studio.initialize();
+    if (!debug) {
+      studio.ui.hide();
+    }
+    const project = getProject('DataCenterRack-3D-Configurator', {
+      state: animationState,
+    });
+    const sheet = project.sheet('Main-Scene');
+
+    _model3d.addStudioCamera(sheet);
+
+    project.ready.then(() => {
+      _model3d.setAnimationSequence(sheet.sequence);
+      setModel3D(_model3d);
+    });
+
     return () => {
       _model3d.renderer.dispose();
     };
@@ -978,6 +1053,7 @@ export default function Configurator3d(props) {
     <>
       <div className={styles.Model3dOverlay} ref={model3dOverlay}></div>
       <canvas className={styles.Model3d} ref={canvasRef} />
+      {/* {debug && <DebugComponent model3d={model3d} />} */}
     </>
   );
 }

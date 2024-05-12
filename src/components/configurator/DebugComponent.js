@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
+import React, { useEffect, useRef } from 'react';
 
 import studio from '@theatre/studio';
 import { getProject, types } from '@theatre/core';
@@ -25,7 +26,7 @@ function onChangeInfoPoint(scene, camera, point, value, dimension) {
   });
 }
 
-export class Debug {
+class Debug {
   constructor(options) {
     this.debugObject = options.debugObject;
     this.camera = options.camera;
@@ -39,7 +40,8 @@ export class Debug {
     this.floor = options.floor;
     this.environmentMap = options.environmentMap;
     this.cube = options.cube;
-    //this.gui = new dat.GUI();
+    this.animationState = options.animationState;
+    // this.gui = new dat.GUI();
 
     // this.addModalExport();
     // this.addObjects();
@@ -58,25 +60,17 @@ export class Debug {
 
   addStudio() {
     studio.initialize();
-    const project = getProject('DataCenterRack-3D-Configurator');
+    const project = getProject('DataCenterRack-3D-Configurator', {
+      state: this.animationState,
+    });
     const sheet = project.sheet('Main-Scene');
     this.addStudioCamera(sheet);
     this.addStudioObjectsScene(sheet);
-
-    /**
-     * const project = getProject('DataCenterRack-3D-Configurator', {
-      state: this.animationState,
-    });
-
-    console.log(23, this.animationState);
-
-    const sheet = project.sheet('Main-Scene');
 
     project.ready.then(() => {
       sheet.sequence.play({ iterationCount: Infinity });
       console.log(24);
     });
-     */
   }
 
   addStudioCamera(sheet) {
@@ -830,4 +824,33 @@ export class Debug {
       )
       .name('Show Config');
   }
+}
+
+export default function DebugComponent({ model3d }) {
+  const flag = useRef();
+  useEffect(() => {
+    if (!model3d) return;
+    if (flag.current) return;
+    flag.current = true;
+    new Debug({
+      debugObject: model3d.config,
+      camera: model3d.camera,
+      bloomPass: model3d.bloomPass,
+      //bokehPass: this.bokehPass,
+      renderer: model3d.renderer,
+      scene: model3d.scene,
+      controls: model3d.controls,
+      bgMaterial: model3d.bgMaterial,
+      bgMesh: model3d.bgMesh,
+      floor: model3d.floor,
+      cube: model3d.cube,
+      environmentMap: model3d.environmentMap,
+      animationState: model3d.animationState,
+    });
+  }, [model3d]);
+  return (
+    <div>
+      <div></div>
+    </div>
+  );
 }
